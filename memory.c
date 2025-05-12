@@ -50,14 +50,6 @@ void load(ToDoList *todo_list, const char *filename) {
     size_t items_count = json_array_size(jarray);
     free(todo_list->items);
 
-    // Allocate new array for tasks
-    todo_list->items = malloc(items_count * sizeof(Task));
-    if (todo_list->items == NULL) {
-        perror("Memory allocation failed");
-        json_decref(jarray);
-        return;
-    }
-
     // Iterate over the JSON array and fill the ToDoList
     for (size_t i = 0; i < items_count; i++) {
         json_t *json_item = json_array_get(jarray, i);

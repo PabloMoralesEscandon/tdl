@@ -22,7 +22,7 @@ int dispatch_command(char *cmd, char* options[]) {
     return 1;
 }
 
-char **parse_options(int argc, char **argv){
+char **parse_options(int argc, char **argv, char **options){
     static struct option long_options[] = {
         {"priority",    required_argument, 0, 'p'},
         {"recurrent",   required_argument, 0, 'r'},
@@ -35,7 +35,7 @@ char **parse_options(int argc, char **argv){
         {0, 0, 0, 0}  
     };
 
-    char *options[NUMBER_OPT] = {0};
+    
     int opt;
 
     while ((opt = getopt_long(argc, argv, "p:r:d:s:c:P:n:D:", long_options, NULL)) != -1) {
@@ -68,6 +68,8 @@ char **parse_options(int argc, char **argv){
                 printf("Unknown option:\n");
         }
     }
+
+    return options;
 }
 
 int cmd_add(char *options[]){
@@ -94,7 +96,7 @@ int cmd_add(char *options[]){
     if(options[DESC]){
         new_task.description = options[DESC];
     } else new_task.description = 0;
-
+    append(to_do_list, new_task);
     save(&new_task, FILE_NAME);
 
     printf("Success!\n");
