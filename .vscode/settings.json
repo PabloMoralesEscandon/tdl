@@ -1,8 +1,0 @@
-{
-    "files.associations": {
-        "getopt.h": "c",
-        "string.h": "c",
-        "add.h": "c",
-        "memory.h": "c"
-    }
-}
