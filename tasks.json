@@ -9,18 +9,24 @@
     },
     {
         "id": 0,
-        "name": "Test",
+        "name": "Prueba2",
+        "description": "none",
         "priority": 1,
         "due": -1,
+        "category": "none",
         "recurrent": 0,
-        "status": 0
+        "status": 0,
+        "project": "none"
     },
     {
         "id": 0,
-        "name": "Test",
+        "name": "Prueba3",
+        "description": "Tarea de prueba",
         "priority": 1,
         "due": -1,
+        "category": "Pruebas",
         "recurrent": 0,
-        "status": 0
+        "status": 0,
+        "project": "none"
     }
 ]

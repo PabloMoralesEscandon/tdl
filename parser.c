@@ -89,13 +89,13 @@ int cmd_add(char *options[]){
     } else new_task.due = -1;
     if(options[PROJECT]){
         // Add logic
-    } else new_task.project = NULL;
+    } else new_task.project = "none";
     if(options[CATEGORY]){
         new_task.category = options[CATEGORY];
-    } else new_task.category = NULL;
+    } else new_task.category = "none";
     if(options[DESC]){
         new_task.description = options[DESC];
-    } else new_task.description = 0;
+    } else new_task.description = "none";
     append(to_do_list, new_task);
     save(&new_task, FILE_NAME);
 
