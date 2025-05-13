@@ -23,7 +23,7 @@ typedef struct {
 
 int dispatch_command(char *cmd, char* options[]);
 
-char **parse_options(int argc, char **argv, char* options[]);
+int parse_options(int argc, char **argv, char* options[]);
 
 int cmd_add(char *options[]);
 

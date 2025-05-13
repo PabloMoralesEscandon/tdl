@@ -22,7 +22,7 @@ int dispatch_command(char *cmd, char* options[]) {
     return 1;
 }
 
-char **parse_options(int argc, char **argv, char **options){
+int parse_options(int argc, char **argv, char **options){
     static struct option long_options[] = {
         {"priority",    required_argument, 0, 'p'},
         {"recurrent",   required_argument, 0, 'r'},
@@ -69,7 +69,7 @@ char **parse_options(int argc, char **argv, char **options){
         }
     }
 
-    return options;
+    return 0;
 }
 
 int cmd_add(char *options[]){
