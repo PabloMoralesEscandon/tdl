@@ -9,6 +9,7 @@
 
 Command commands[] = {
     {"add",    cmd_add},
+    {"show",    cmd_show},
     {NULL,     NULL}  // Sentinel to mark end
 };
 
@@ -98,8 +99,6 @@ int cmd_add(char *options[]){
     } else new_task.description = "none";
     append(to_do_list, new_task);
     save(&new_task, FILE_NAME);
-
-    printf("Success!\n");
     return 0;
 }
 
@@ -116,4 +115,15 @@ int cmd_list(char *options[]){
 int cmd_mod(char *options[]){
     printf("Success!\n");
     return 0;
+}
+
+int cmd_show(char *options[]){
+    for(int i=0; i<to_do_list.n_items; i++){
+        if(!strcmp(options[NAME], to_do_list.items[i].name)){
+            print_task(&to_do_list.items[i]);
+            return(0);
+        }
+    }
+    printf("Could not find task: %s", options[NAME]);
+    return 1;
 }

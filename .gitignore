@@ -1,4 +1,4 @@
-build/
+build/*
 .vscode/
 a.out
 tasks.json

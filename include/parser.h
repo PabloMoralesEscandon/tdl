@@ -33,4 +33,6 @@ int cmd_list(char *options[]);
 
 int cmd_mod(char *options[]);
 
+int cmd_show(char *options[]);
+
 #endif
