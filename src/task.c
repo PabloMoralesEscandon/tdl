@@ -15,7 +15,13 @@ void print_task(Task *task){
     printf("Name: %s\n", task->name ? task->name : "(none)");
     printf("Description: %s\n", task->description ? task->description : "(none)");
     printf("Priority: %d\n", task->priority);
-    printf("Due: %d\n", task->due);
+    switch(task->recurrent){
+        case -1:
+            break;
+        default:
+            printf("Due: %d\n", task->due);
+
+    }
     printf("Recurrent: %d\n", task->recurrent);
     printf("Status: %d\n", task->status);
     printf("Category: %s\n", task->category ? task->category : "(none)");
