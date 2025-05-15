@@ -26,7 +26,7 @@ void print_task(Task *task){
             printf("Priority: High\n");
             break;
         case 3:
-        printf("Priority: URGENT\n");
+            printf("Priority: URGENT\n");
             break;
 
     }
@@ -35,6 +35,23 @@ void print_task(Task *task){
             break;
         default:
             printf("Due: %d\n", task->due);
+
+    }
+    switch(task->recurrent){
+        case 0:
+            break;
+        case 1:
+            printf("Daily.\n");
+            break;
+        case 2:
+            printf("Weekly.\n");
+            break;
+        case 3:
+            printf("Monthly\n");
+            break;
+        case 4:
+            printf("Yearly\n");
+            break;
 
     }
     printf("Recurrent: %d\n", task->recurrent);
