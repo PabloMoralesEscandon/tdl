@@ -3,6 +3,9 @@
 
 #include <stdlib.h>
 
+#define NAME_CHARS 21
+#define DESC_CHARS 201
+
 enum Status {
     TODO,
     IN_PROGRESS,

@@ -77,8 +77,18 @@ int cmd_add(char *options[]){
     Task new_task = {0};
     new_task.id = 0;
     new_task.status = TODO;
-    if(options[NAME]) new_task.name = strdup(options[NAME]);
-    else new_task.name = strdup( "Task");
+    if (options[NAME]) {
+        if ((strlen(options[NAME])+1) > NAME_CHARS) {
+            printf("Name is too long. Max %d characters.\n", NAME_CHARS);
+            return 1;
+        }
+        new_task.name = strdup(options[NAME]);
+    }
+    else {
+        char name[NAME_CHARS];
+        snprintf(name, sizeof(name), "Task %d", new_task.id);
+        new_task.name = strdup(name);
+    }
     if(options[PRIORITY]){
         // Add logic
     } else new_task.priority = MEDIUM;

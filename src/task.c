@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 
 #include "task.h"
 
@@ -12,8 +13,9 @@ void print_task(Task *task){
         return;
     }
     printf("Task ID: %d\n", task->id);
-    printf("Name: %s\n", task->name ? task->name : "(none)");
-    printf("Description: %s\n", task->description ? task->description : "(none)");
+    printf("Name: %s\n", task->name);
+    if(strcmp("none", task->description))
+        printf("Description: %s\n", task->description);
     printf("Priority: %d\n", task->priority);
     switch(task->priority){
         case 0:
