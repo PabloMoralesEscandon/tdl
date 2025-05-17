@@ -4,6 +4,7 @@
 #include <string.h>
 
 #include "task.h"
+#include "utils.h"
 
 // Assuming ToDoList and Task are defined something like this:
 // typedef struct {
@@ -106,6 +107,8 @@ void load(ToDoList *todo_list, const char *filename) {
     }
 
     json_decref(jarray);
+
+    sort_list(to_do_list.items, 0, to_do_list.n_items - 1);
 }
 
 void save(Task *task, const char *filename) {

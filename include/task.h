@@ -33,8 +33,8 @@ enum Recurrent{
             if(da.size == 0) da.size = 256;\
             else da.size*=2;\
             da.items = realloc(da.items, da.size*sizeof(*da.items));\
-            da.items[da.n_items++] = element;\
         }\
+        da.items[da.n_items++] = element;\
     } while(0)\
 
 typedef struct{

@@ -75,7 +75,9 @@ int parse_options(int argc, char **argv, char **options){
 
 int cmd_add(char *options[]){
     Task new_task = {0};
-    new_task.id = 0;
+    int task_id = 0;
+    while(to_do_list.items[task_id].id == task_id) task_id++;
+    new_task.id = task_id;
     new_task.status = TODO;
     if (options[NAME]) {
         if ((strlen(options[NAME])+1) > NAME_CHARS) {
