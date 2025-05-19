@@ -14,10 +14,10 @@ Command commands[] = {
     {NULL,     NULL}  // Sentinel to mark end
 };
 
-int dispatch_command(char *cmd, char* options[]) {
+int dispatch_command(char *cmd, char* options[], int id) {
     for (int i = 0; commands[i].name != NULL; i++) {
         if (strcmp(commands[i].name, cmd) == 0) {
-            return commands[i].handler(options);
+            return commands[i].handler(options, id);
         }
     }
     printf("Unknown command: %s\n", cmd);
@@ -50,10 +50,10 @@ int parse_id_name(char *words){
     while(isdigit(words[i++]));
     if((i-1)==strlen(words)){
         printf("It is an id\n");
-        return 0;
+        return atoi(words);
     } else{
         printf("It is a name\n");
-        return 0;
+        return -1;
     }
 }
 
@@ -107,7 +107,7 @@ int parse_options(int argc, char **argv, char **options){
     return 0;
 }
 
-int cmd_add(char *options[]){
+int cmd_add(char *options[], int id){
     Task new_task = {0};
     int task_id = 0;
     while(to_do_list.items[task_id].id == task_id) task_id++;
@@ -148,22 +148,31 @@ int cmd_add(char *options[]){
     return 0;
 }
 
-int cmd_del(char *options[]){
+int cmd_del(char *options[], int id){
     printf("Success!\n");
     return 0;
 }
 
-int cmd_list(char *options[]){
+int cmd_list(char *options[], int id){
     printf("Success!\n");
     return 0;
 }
 
-int cmd_mod(char *options[]){
+int cmd_mod(char *options[], int id){
     printf("Success!\n");
     return 0;
 }
 
-int cmd_show(char *options[]){
+int cmd_show(char *options[], int id){
+    if(id!=-1){
+        for(int i=0; i<to_do_list.n_items; i++){
+            if(id == to_do_list.items[i].id){
+                print_task(&to_do_list.items[i]);
+                return(0);
+            }
+        }
+
+    }
     for(int i=0; i<to_do_list.n_items; i++){
         if(!strcmp(options[NAME], to_do_list.items[i].name)){
             print_task(&to_do_list.items[i]);
