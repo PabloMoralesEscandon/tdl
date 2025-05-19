@@ -3,6 +3,7 @@
 #include <getopt.h>
 #include <stdio.h>
 #include <string.h>
+#include <ctype.h>
 
 #include "task.h"
 #include "memory.h"
@@ -21,6 +22,39 @@ int dispatch_command(char *cmd, char* options[]) {
     }
     printf("Unknown command: %s\n", cmd);
     return 1;
+}
+
+char *parse_words(int argc, char **argv){
+    int i = 2;
+    while((i<argc)&&(argv[i][0]!='-')) i++;
+    int size = 0;
+    for(int n=2; n<i; n++){
+        size+=strlen(argv[n])+1;
+    }
+    if(size>NAME_CHARS){
+        printf("Name is too long\n");
+        return 0;
+    }
+    char *words=malloc(size);
+    if(i>2) strcpy(words, argv[2]);
+    for(int n=3; n<i; n++){
+        strcat(words, " ");
+        strcat(words, argv[n]);
+    }
+    printf("%d  %s\n", i, words);
+    return words;
+}
+
+int parse_id_name(char *words){
+    int i=0;
+    while(isdigit(words[i++]));
+    if((i-1)==strlen(words)){
+        printf("It is an id\n");
+        return 0;
+    } else{
+        printf("It is a name\n");
+        return 0;
+    }
 }
 
 int parse_options(int argc, char **argv, char **options){

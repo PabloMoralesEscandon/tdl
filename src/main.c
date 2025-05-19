@@ -6,7 +6,8 @@ int main (int argc, char **argv) {
     load(&to_do_list, FILE_NAME);
     char *command = argv[1];
     char *options[NUMBER_OPT] = {0};
-    char **words = NULL;
-    int id = parse_options(argc, argv, options);
+    char *words = parse_words(argc, argv);
+    int id = parse_id_name(words);
+    parse_options(argc, argv, options);
     return dispatch_command(command, options);
 }
