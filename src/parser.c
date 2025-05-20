@@ -11,6 +11,7 @@
 Command commands[] = {
     {"add",    cmd_add},
     {"show",    cmd_show},
+    {"mod",    cmd_mod},
     {NULL,     NULL}  // Sentinel to mark end
 };
 
@@ -159,7 +160,77 @@ int cmd_list(char *options[], int id){
 }
 
 int cmd_mod(char *options[], int id){
-    printf("Success!\n");
+    if(id!=-1){
+        for(int i=0; (i<to_do_list.n_items) && (i<=id); i++){
+            if(id==to_do_list.items[i].id){
+                if (options[NAME]) {
+                    if ((strlen(options[NAME])+1) > NAME_CHARS) {
+                        printf("Name is too long. Max %d characters.\n", NAME_CHARS);
+                        return 1;
+                    }
+                    free(to_do_list.items[i].name);
+                    to_do_list.items[i].name = strdup(options[NAME]);
+                }
+                if(options[PRIORITY]){
+                    // Add logic
+                }
+                if(options[RECURRENT]){
+                    // Add logic
+                }
+                if(options[DUE]){
+                    // Add logic
+                }
+                if(options[PROJECT]){
+                    // Add logic
+                }
+                if(options[CATEGORY]){
+                    free(to_do_list.items[i].category);
+                    to_do_list.items[i].category = strdup(options[CATEGORY]);
+                }
+                if(options[DESC]){
+                    if ((strlen(options[DESC])+1) > DESC_CHARS) {
+                        printf("Description is too long. Max %d characters.\n", DESC_CHARS);
+                        return 1;
+                    }
+                    free(to_do_list.items[i].description);
+                    to_do_list.items[i].description = strdup(options[DESC]);
+                }
+                // Save to json
+
+            }
+        }
+    } else if(options[NAME]!=NULL){
+        for(int i=0; (i<to_do_list.n_items) && (i<=id); i++){
+            if(!strcmp(options[NAME], to_do_list.items[i].name)){
+                if(options[PRIORITY]){
+                    // Add logic
+                }
+                if(options[RECURRENT]){
+                    // Add logic
+                }
+                if(options[DUE]){
+                    // Add logic
+                }
+                if(options[PROJECT]){
+                    // Add logic
+                }
+                if(options[CATEGORY]){
+                    free(to_do_list.items[i].category);
+                    to_do_list.items[i].category = strdup(options[CATEGORY]);
+                }
+                if(options[DESC]){
+                    if ((strlen(options[DESC])+1) > DESC_CHARS) {
+                        printf("Description is too long. Max %d characters.\n", DESC_CHARS);
+                        return 1;
+                    }
+                    free(to_do_list.items[i].description);
+                    to_do_list.items[i].description = strdup(options[DESC]);
+                }
+                // Save to json
+
+            }
+        }
+    }
     return 0;
 }
 
