@@ -167,3 +167,54 @@ void save(Task *task, const char *filename) {
     fclose(file);
     json_decref(jarray);
 }
+
+int delete_task(const char *filename, int target_id) {
+    json_error_t error;
+    json_t *root;
+
+    // 1. Load and parse JSON file
+    root = json_load_file(filename, 0, &error);
+    if (!root) {
+        fprintf(stderr, "Error loading JSON: %s (line %d)\n", error.text, error.line);
+        return 1;
+    }
+
+    // 2. Verify it's an array
+    if (!json_is_array(root)) {
+        fprintf(stderr, "Root is not an array\n");
+        json_decref(root);
+        return 1;
+    }
+
+    // 3. Find and remove target item
+    size_t index;
+    json_t *value;
+    int found = 0;
+
+    json_array_foreach(root, index, value) {
+        json_t *id_obj = json_object_get(value, "id");
+        if (id_obj && json_is_integer(id_obj)) {
+            if (json_integer_value(id_obj) == target_id) {
+                json_array_remove(root, index);
+                found = 1;
+                printf("Removed item with ID %d\n", target_id);
+                break;
+            }
+        }
+    }
+
+    if (!found) {
+        printf("No item with ID %d found\n", target_id);
+    }
+
+    // 4. Save modified JSON back to file
+    if (json_dump_file(root, filename, JSON_INDENT(4)) != 0) {
+        fprintf(stderr, "Error saving file\n");
+        json_decref(root);
+        return 1;
+    }
+
+    // 5. Cleanup
+    json_decref(root);
+    return 0;
+}

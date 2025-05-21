@@ -127,10 +127,24 @@ int cmd_add(char *options[], int id){
         new_task.name = strdup(name);
     }
     if(options[PRIORITY]){
-        // Add logic
+        if(!strcmp(options[PRIORITY], "low")) new_task.priority = LOW;
+        else if(!strcmp(options[PRIORITY], "medium")) new_task.priority = MEDIUM;
+        else if(!strcmp(options[PRIORITY], "high")) new_task.priority = HIGH;
+        else if(!strcmp(options[PRIORITY], "urgent")) new_task.priority = URGENT;
+        else{
+            printf("Invalid priority option: %s\nValid options: low, medium, high, urgent\n", options[RECURRENT]);
+            return 1;
+        }
     } else new_task.priority = MEDIUM;
     if(options[RECURRENT]){
-        // Add logic
+        if(!strcmp(options[RECURRENT], "daily")) new_task.recurrent = DAILY;
+        else if(!strcmp(options[RECURRENT], "weekly")) new_task.recurrent = WEEKLY;
+        else if(!strcmp(options[RECURRENT], "monthly")) new_task.recurrent = MONTHLY;
+        else if(!strcmp(options[RECURRENT], "yearly")) new_task.recurrent = YEARLY;
+        else{
+            printf("Invalid recurrence option: %s\nValid options: daily, weekly, monthly, yearly\n", options[RECURRENT]);
+            return 1;
+        }
     } else new_task.recurrent = NO;
     if(options[DUE]){
         // Add logic
@@ -172,10 +186,24 @@ int cmd_mod(char *options[], int id){
                     to_do_list.items[i].name = strdup(options[NAME]);
                 }
                 if(options[PRIORITY]){
-                    // Add logic
+                    if(!strcmp(options[PRIORITY], "low")) to_do_list.items[i].priority = LOW;
+                    else if(!strcmp(options[PRIORITY], "medium")) to_do_list.items[i].priority = MEDIUM;
+                    else if(!strcmp(options[PRIORITY], "high")) to_do_list.items[i].priority = HIGH;
+                    else if(!strcmp(options[PRIORITY], "urgent")) to_do_list.items[i].priority = URGENT;
+                    else{
+                        printf("Invalid priority option: %s\nValid options: low, medium, high, urgent\n", options[RECURRENT]);
+                        return 1;
+                    }
                 }
                 if(options[RECURRENT]){
-                    // Add logic
+                    if(!strcmp(options[RECURRENT], "daily")) to_do_list.items[i].recurrent = DAILY;
+                    else if(!strcmp(options[RECURRENT], "weekly")) to_do_list.items[i].recurrent = WEEKLY;
+                    else if(!strcmp(options[RECURRENT], "monthly")) to_do_list.items[i].recurrent = MONTHLY;
+                    else if(!strcmp(options[RECURRENT], "yearly")) to_do_list.items[i].recurrent = YEARLY;
+                    else{
+                        printf("Invalid recurrence option: %s\nValid options: daily, weekly, monthly, yearly\n", options[RECURRENT]);
+                        return 1;
+                    }
                 }
                 if(options[DUE]){
                     // Add logic
@@ -226,11 +254,13 @@ int cmd_mod(char *options[], int id){
                     free(to_do_list.items[i].description);
                     to_do_list.items[i].description = strdup(options[DESC]);
                 }
-                // Save to json
+                id = to_do_list.items[i].id;
 
             }
         }
     }
+    delete_task(FILE_NAME, id);
+    save(&to_do_list.items[id], FILE_NAME);
     return 0;
 }
 

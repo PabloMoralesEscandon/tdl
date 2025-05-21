@@ -21,8 +21,8 @@ enum Priority {
 
 enum Recurrent{
     NO,
-    WEEKLY,
     DAILY,
+    WEEKLY,
     MONTHLY,
     YEARLY
 };
