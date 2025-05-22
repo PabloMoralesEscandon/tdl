@@ -12,6 +12,7 @@ Command commands[] = {
     {"add",    cmd_add},
     {"show",    cmd_show},
     {"mod",    cmd_mod},
+    {"del",    cmd_del},
     {NULL,     NULL}  // Sentinel to mark end
 };
 
@@ -164,8 +165,24 @@ int cmd_add(char *options[], int id){
 }
 
 int cmd_del(char *options[], int id){
-    printf("Success!\n");
-    return 0;
+    if(id!=-1){
+        delete_task(FILE_NAME, id);
+        printf("Deleted task: %d\n", id);
+        return 0;
+    } else if(options[NAME]!=NULL){
+        for(int i=0; i<to_do_list.n_items; i++){
+            if(!strcmp(options[NAME], to_do_list.items[i].name)){
+                id = to_do_list.items[i].id;
+                delete_task(FILE_NAME, id);
+                printf("Deleted task: %d\n", id);
+                return 0;
+            }
+        }
+        printf("No task with name: %s\n", options[NAME]);
+        return 1;
+    }
+    printf("Please provide id or name of task to delete\n");
+    return 1;
 }
 
 int cmd_list(char *options[], int id){
