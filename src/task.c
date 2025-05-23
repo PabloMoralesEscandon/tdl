@@ -32,13 +32,7 @@ void print_task(Task *task){
             break;
 
     }
-    switch(task->recurrent){
-        case -1:
-            break;
-        default:
-            printf("Due: %d\n", task->due);
-
-    }
+    if(task->due!=-1) printf("Due: %d\n", task->due);
     switch(task->recurrent){
         case 0:
             break;
@@ -57,7 +51,17 @@ void print_task(Task *task){
 
     }
     printf("Recurrent: %d\n", task->recurrent);
-    printf("Status: %d\n", task->status);
+    switch(task->status){
+        case TODO:
+            printf("To do.\n");
+            break;
+        case IN_PROGRESS:
+            printf("In progress.\n");
+            break;
+        case DONE:
+            printf("Done.\n");
+            break;
+    }
     printf("Category: %s\n", task->category ? task->category : "(none)");
     printf("Project: %s\n", task->project ? task->project : "(none)");
 }

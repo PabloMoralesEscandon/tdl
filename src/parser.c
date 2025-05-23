@@ -12,6 +12,8 @@ Command commands[] = {
     {"add",    cmd_add},
     {"show",    cmd_show},
     {"mod",    cmd_mod},
+    {"start",    cmd_start},
+    {"done",    cmd_done},
     {"del",    cmd_del},
     {NULL,     NULL}  // Sentinel to mark end
 };
@@ -195,7 +197,7 @@ int cmd_list(char *options[], int id){
 
 int cmd_mod(char *options[], int id){
     if(id!=-1){
-        for(int i=0; (i<to_do_list.n_items) && (i<=id); i++){
+        for(int i=0; i<to_do_list.n_items; i++){
             if(id==to_do_list.items[i].id){
                 if (options[NAME]) {
                     if ((strlen(options[NAME])+1) > NAME_CHARS) {
@@ -243,18 +245,25 @@ int cmd_mod(char *options[], int id){
                     free(to_do_list.items[i].description);
                     to_do_list.items[i].description = strdup(options[DESC]);
                 }
-                // Save to json
-
+                break;
             }
+            
         }
     } else if(options[NAME]!=NULL){
-        for(int i=0; (i<to_do_list.n_items) && (i<=id); i++){
+        for(int i=0; i<to_do_list.n_items; i++){
             if(!strcmp(options[NAME], to_do_list.items[i].name)){
                 if(options[PRIORITY]){
                     // Add logic
                 }
                 if(options[RECURRENT]){
-                    // Add logic
+                    if(!strcmp(options[RECURRENT], "daily")) to_do_list.items[i].recurrent = DAILY;
+                    else if(!strcmp(options[RECURRENT], "weekly")) to_do_list.items[i].recurrent = WEEKLY;
+                    else if(!strcmp(options[RECURRENT], "monthly")) to_do_list.items[i].recurrent = MONTHLY;
+                    else if(!strcmp(options[RECURRENT], "yearly")) to_do_list.items[i].recurrent = YEARLY;
+                    else{
+                        printf("Invalid recurrence option: %s\nValid options: daily, weekly, monthly, yearly\n", options[RECURRENT]);
+                        return 1;
+                    }
                 }
                 if(options[DUE]){
                     // Add logic
@@ -275,7 +284,52 @@ int cmd_mod(char *options[], int id){
                     to_do_list.items[i].description = strdup(options[DESC]);
                 }
                 id = to_do_list.items[i].id;
+                break;
 
+            }
+        }
+    }
+    delete_task(FILE_NAME, id);
+    save(&to_do_list.items[id], FILE_NAME);
+    return 0;
+}
+
+int cmd_start(char *options[], int id){
+    if(id!=-1){
+        for(int i=0; (i<to_do_list.n_items) && (i<=id); i++){
+            if(id==to_do_list.items[i].id){
+                to_do_list.items[i].status = IN_PROGRESS;
+                break;
+            }
+        }
+    } else if(options[NAME]!=NULL){
+        for(int i=0; i<to_do_list.n_items; i++){
+            if(!strcmp(options[NAME], to_do_list.items[i].name)){
+                to_do_list.items[i].status = IN_PROGRESS;
+                id = to_do_list.items[i].id;
+                break;
+            }
+        }
+    }
+    delete_task(FILE_NAME, id);
+    save(&to_do_list.items[id], FILE_NAME);
+    return 0;
+}
+
+int cmd_done(char *options[], int id){
+    if(id!=-1){
+        for(int i=0; i<to_do_list.n_items; i++){
+            if(id==to_do_list.items[i].id){
+                to_do_list.items[i].status = DONE;
+                break;
+            }
+        }
+    } else if(options[NAME]!=NULL){
+        for(int i=0; i<to_do_list.n_items; i++){
+            if(!strcmp(options[NAME], to_do_list.items[i].name)){
+                to_do_list.items[i].status = DONE;
+                id = to_do_list.items[i].id;
+                break;
             }
         }
     }
