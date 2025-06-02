@@ -195,102 +195,80 @@ int cmd_list(char *options[], int id){
     return 0;
 }
 
-int cmd_mod(char *options[], int id){
-    if(id!=-1){
-        for(int i=0; i<to_do_list.n_items; i++){
-            if(id==to_do_list.items[i].id){
-                if (options[NAME]) {
-                    if ((strlen(options[NAME])+1) > NAME_CHARS) {
-                        printf("Name is too long. Max %d characters.\n", NAME_CHARS);
-                        return 1;
-                    }
-                    free(to_do_list.items[i].name);
-                    to_do_list.items[i].name = strdup(options[NAME]);
-                }
-                if(options[PRIORITY]){
-                    if(!strcmp(options[PRIORITY], "low")) to_do_list.items[i].priority = LOW;
-                    else if(!strcmp(options[PRIORITY], "medium")) to_do_list.items[i].priority = MEDIUM;
-                    else if(!strcmp(options[PRIORITY], "high")) to_do_list.items[i].priority = HIGH;
-                    else if(!strcmp(options[PRIORITY], "urgent")) to_do_list.items[i].priority = URGENT;
-                    else{
-                        printf("Invalid priority option: %s\nValid options: low, medium, high, urgent\n", options[RECURRENT]);
-                        return 1;
-                    }
-                }
-                if(options[RECURRENT]){
-                    if(!strcmp(options[RECURRENT], "daily")) to_do_list.items[i].recurrent = DAILY;
-                    else if(!strcmp(options[RECURRENT], "weekly")) to_do_list.items[i].recurrent = WEEKLY;
-                    else if(!strcmp(options[RECURRENT], "monthly")) to_do_list.items[i].recurrent = MONTHLY;
-                    else if(!strcmp(options[RECURRENT], "yearly")) to_do_list.items[i].recurrent = YEARLY;
-                    else{
-                        printf("Invalid recurrence option: %s\nValid options: daily, weekly, monthly, yearly\n", options[RECURRENT]);
-                        return 1;
-                    }
-                }
-                if(options[DUE]){
-                    // Add logic
-                }
-                if(options[PROJECT]){
-                    // Add logic
-                }
-                if(options[CATEGORY]){
-                    free(to_do_list.items[i].category);
-                    to_do_list.items[i].category = strdup(options[CATEGORY]);
-                }
-                if(options[DESC]){
-                    if ((strlen(options[DESC])+1) > DESC_CHARS) {
-                        printf("Description is too long. Max %d characters.\n", DESC_CHARS);
-                        return 1;
-                    }
-                    free(to_do_list.items[i].description);
-                    to_do_list.items[i].description = strdup(options[DESC]);
-                }
-                break;
-            }
-            
-        }
-    } else if(options[NAME]!=NULL){
-        for(int i=0; i<to_do_list.n_items; i++){
-            if(!strcmp(options[NAME], to_do_list.items[i].name)){
-                if(options[PRIORITY]){
-                    // Add logic
-                }
-                if(options[RECURRENT]){
-                    if(!strcmp(options[RECURRENT], "daily")) to_do_list.items[i].recurrent = DAILY;
-                    else if(!strcmp(options[RECURRENT], "weekly")) to_do_list.items[i].recurrent = WEEKLY;
-                    else if(!strcmp(options[RECURRENT], "monthly")) to_do_list.items[i].recurrent = MONTHLY;
-                    else if(!strcmp(options[RECURRENT], "yearly")) to_do_list.items[i].recurrent = YEARLY;
-                    else{
-                        printf("Invalid recurrence option: %s\nValid options: daily, weekly, monthly, yearly\n", options[RECURRENT]);
-                        return 1;
-                    }
-                }
-                if(options[DUE]){
-                    // Add logic
-                }
-                if(options[PROJECT]){
-                    // Add logic
-                }
-                if(options[CATEGORY]){
-                    free(to_do_list.items[i].category);
-                    to_do_list.items[i].category = strdup(options[CATEGORY]);
-                }
-                if(options[DESC]){
-                    if ((strlen(options[DESC])+1) > DESC_CHARS) {
-                        printf("Description is too long. Max %d characters.\n", DESC_CHARS);
-                        return 1;
-                    }
-                    free(to_do_list.items[i].description);
-                    to_do_list.items[i].description = strdup(options[DESC]);
-                }
-                id = to_do_list.items[i].id;
-                break;
 
+// Fix implementation (if no id -> get id -> logic)
+// Same for start and done
+int cmd_mod(char *options[], int id){
+    int index = -1;
+    if(id==-1){
+        if(options[NAME]!=NULL){
+            for(int i=0; i<to_do_list.n_items; i++){
+                if(!strcmp(options[NAME], to_do_list.items[i].name)){
+                    index = i;
+                    break;
+                }
             }
+            if(index == -1){
+                printf("Could not find task %s\n", options[NAME]);
+                return 1;
+            }
+        } else{
+            printf("Provide either an id or a name for the task.\n");
+            return 1;
+        }
+            
+    } else for(int i=0; i<to_do_list.n_items; i++){
+        if(id == to_do_list.items[i].id){
+            index = i;
+            break;
+
         }
     }
+    if(index == -1){
+        printf("Could not find task with id %d\n", id);
+        return 1;
+    }
+    if(options[PRIORITY]){
+        if(!strcmp(options[PRIORITY], "low")) to_do_list.items[index].priority = LOW;
+        else if(!strcmp(options[PRIORITY], "medium")) to_do_list.items[index].priority = MEDIUM;
+        else if(!strcmp(options[PRIORITY], "high")) to_do_list.items[index].priority = HIGH;
+        else if(!strcmp(options[PRIORITY], "urgent")) to_do_list.items[index].priority = URGENT;
+        else{
+            printf("Invalid priority option: %s\nValid options: low, medium, high, urgent\n", options[RECURRENT]);
+            return 1;
+        }
+    }
+    if(options[RECURRENT]){
+        if(!strcmp(options[RECURRENT], "daily")) to_do_list.items[index].recurrent = DAILY;
+        else if(!strcmp(options[RECURRENT], "weekly")) to_do_list.items[index].recurrent = WEEKLY;
+        else if(!strcmp(options[RECURRENT], "monthly")) to_do_list.items[index].recurrent = MONTHLY;
+        else if(!strcmp(options[RECURRENT], "yearly")) to_do_list.items[index].recurrent = YEARLY;
+        else{
+            printf("Invalid recurrence option: %s\nValid options: daily, weekly, monthly, yearly\n", options[RECURRENT]);
+            return 1;
+        }
+    }
+    if(options[DUE]){
+        // Add logic
+    }
+    if(options[PROJECT]){
+        // Add logic
+    }
+    if(options[CATEGORY]){
+        free(to_do_list.items[index].category);
+        to_do_list.items[index].category = strdup(options[CATEGORY]);
+    }
+    if(options[DESC]){
+        if ((strlen(options[DESC])+1) > DESC_CHARS) {
+            printf("Description is too long. Max %d characters.\n", DESC_CHARS);
+            return 1;
+        }
+        free(to_do_list.items[index].description);
+        to_do_list.items[index].description = strdup(options[DESC]);
+    }
+    id = to_do_list.items[index].id;
     delete_task(FILE_NAME, id);
-    save(&to_do_list.items[id], FILE_NAME);
+    save(&to_do_list.items[index], FILE_NAME);
     return 0;
 }
 
