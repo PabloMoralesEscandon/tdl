@@ -228,6 +228,9 @@ int cmd_mod(char *options[], int id){
         printf("Could not find task with id %d\n", id);
         return 1;
     }
+    if(options[NAME]){
+        to_do_list.items[index].name = options[NAME];
+    }
     if(options[PRIORITY]){
         if(!strcmp(options[PRIORITY], "low")) to_do_list.items[index].priority = LOW;
         else if(!strcmp(options[PRIORITY], "medium")) to_do_list.items[index].priority = MEDIUM;
