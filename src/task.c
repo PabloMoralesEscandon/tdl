@@ -50,7 +50,6 @@ void print_task(Task *task){
             break;
 
     }
-    printf("Recurrent: %d\n", task->recurrent);
     switch(task->status){
         case TODO:
             printf("To do.\n");
@@ -64,4 +63,45 @@ void print_task(Task *task){
     }
     printf("Category: %s\n", task->category ? task->category : "(none)");
     printf("Project: %s\n", task->project ? task->project : "(none)");
+}
+
+char *get_priority(int priority){
+    switch(priority){
+        case LOW:
+            return "Low";
+        case MEDIUM:
+            return "Medium";
+        case HIGH:
+            return "High";
+        case URGENT:
+            return "URGENT";
+
+    }
+}
+
+char *get_recurrence(int recurrence){
+    switch(recurrence){
+        case NO:
+            return "No";
+        case DAILY:
+            return "Daily";
+        case WEEKLY:
+            return "Weekly";
+        case MONTHLY:
+            return "Monthly";
+        case YEARLY:
+            return "Yearly";
+
+    }
+}
+
+char *get_status(int status){
+    switch(status){
+        case TODO:
+            return "To do";
+        case IN_PROGRESS:
+            return "In progress";
+        case DONE:
+            return "Done";
+    }
 }

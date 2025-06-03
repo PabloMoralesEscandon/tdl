@@ -340,13 +340,13 @@ void print_task_table_header() {
 }
 
 void print_task_table_row(Task *t) {
-    printf("%-5d %-15s %-10d %-8d %-10d %-10d %-15s %-15s %-15s\n",
+    printf("%-5d %-15s %-10s %-8d %-10s %-10s %-15s %-15s %-15s\n",
            t->id,
            t->name ? t->name : "(none)",
-           t->priority,
+           get_priority(t->priority),
            t->due,
-           t->recurrent,
-           t->status,
+           get_recurrence(t->recurrent),
+           get_status(t->status),
            t->category ? t->category : "(none)",
            t->project ? t->project : "(none)",
            t->description ? t->description : "(none)");

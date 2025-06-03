@@ -75,4 +75,10 @@ extern ToDoProjects to_do_projects;
 
 void print_task(Task *task);
 
+char *get_priority(int priority);
+
+char *get_recurrence(int recurrence);
+
+char *get_status(int status);
+
 #endif
