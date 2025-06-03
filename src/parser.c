@@ -40,6 +40,7 @@ char *parse_words(int argc, char **argv){
         printf("Name is too long\n");
         return 0;
     }
+    if(!size) return "";
     char *words=malloc(size);
     if(i>2) strcpy(words, argv[2]);
     for(int n=3; n<i; n++){
@@ -356,6 +357,15 @@ int cmd_list(char *options[], int id) {
 
     print_task_table_header();
     for (int i = 0; i < to_do_list.n_items; i++) {
+        if((id!=-1) && (to_do_list.items[i].id!=id)) break;
+       // if(options[PRIORITY] && (to_do_list.items[i].priority!=options[PRIORITY])) break;
+       // if(options[RECURRENT] && (to_do_list.items[i].recurrent!=options[RECURRENT])) break;
+      //  if(options[DUE] && (to_do_list.items[i].due!=options[DUE])) break;
+       // if((options[STATUS] && (to_do_list.items[i].status!=options[STATUS])) || (!options[STATUS] && (to_do_list.items[i].status==DONE))) break;
+        if(options[CATEGORY] && (to_do_list.items[i].category!=options[CATEGORY])) break;
+        if(options[PROJECT] && (to_do_list.items[i].project!=options[PROJECT])) break;
+        if(options[NAME] && (to_do_list.items[i].name!=options[NAME])) break;
+        if(options[DESC] && (to_do_list.items[i].description!=options[DESC])) break;
         print_task_table_row(&to_do_list.items[i]);
     }
     return 0;
