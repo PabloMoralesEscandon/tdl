@@ -33,8 +33,6 @@ int cmd_add(char *options[], int id);
 
 int cmd_del(char *options[], int id);
 
-int cmd_list(char *options[], int id);
-
 int cmd_mod(char *options[], int id);
 
 int cmd_start(char *options[], int id);
@@ -42,5 +40,7 @@ int cmd_start(char *options[], int id);
 int cmd_done(char *options[], int id);
 
 int cmd_show(char *options[], int id);
+
+int cmd_list(char *options[], int id);
 
 #endif

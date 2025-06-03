@@ -15,6 +15,7 @@ Command commands[] = {
     {"start",    cmd_start},
     {"done",    cmd_done},
     {"del",    cmd_del},
+    {"list",    cmd_list},
     {NULL,     NULL}  // Sentinel to mark end
 };
 
@@ -190,12 +191,6 @@ int cmd_del(char *options[], int id){
     return 1;
 }
 
-int cmd_list(char *options[], int id){
-    printf("Success!\n");
-    return 0;
-}
-
-
 // Fix implementation (if no id -> get id -> logic)
 // Same for start and done
 int cmd_mod(char *options[], int id){
@@ -337,4 +332,31 @@ int cmd_show(char *options[], int id){
     }
     printf("Could not find task: %s", options[NAME]);
     return 1;
+}
+
+void print_task_table_header() {
+    printf("%-5s %-15s %-10s %-8s %-10s %-10s %-15s %-15s %-15s\n",
+           "ID", "Name", "Priority", "Due", "Recurrent", "Status", "Category", "Project", "Description");
+}
+
+void print_task_table_row(Task *t) {
+    printf("%-5d %-15s %-10d %-8d %-10d %-10d %-15s %-15s %-15s\n",
+           t->id,
+           t->name ? t->name : "(none)",
+           t->priority,
+           t->due,
+           t->recurrent,
+           t->status,
+           t->category ? t->category : "(none)",
+           t->project ? t->project : "(none)",
+           t->description ? t->description : "(none)");
+}
+
+int cmd_list(char *options[], int id) {
+
+    print_task_table_header();
+    for (int i = 0; i < to_do_list.n_items; i++) {
+        print_task_table_row(&to_do_list.items[i]);
+    }
+    return 0;
 }
