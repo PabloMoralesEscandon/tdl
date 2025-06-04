@@ -156,7 +156,7 @@ int cmd_add(char *options[], int id){
     } else new_task.recurrent = NO;
     if(options[DUE]){
         // Add logic
-    } else new_task.due = -1;
+    } else new_task.due = 0;
     if(options[PROJECT]){
         // Add logic
     } else new_task.project = "none";

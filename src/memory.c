@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 #include "task.h"
 #include "utils.h"
@@ -64,7 +65,15 @@ void load(ToDoList *todo_list, const char *filename) {
         json_t *json_name = json_object_get(json_item, "name");
         json_t *json_desc = json_object_get(json_item, "description");
         json_t *json_prio = json_object_get(json_item, "priority");
-        json_t *json_due = json_object_get(json_item, "due");
+        json_t *json_sec = json_object_get(json_item, "tm_sec");
+        json_t *json_min = json_object_get(json_item, "tm_min");
+        json_t *json_hour = json_object_get(json_item, "tm_hour");
+        json_t *json_mday = json_object_get(json_item, "tm_mday");
+        json_t *json_mon = json_object_get(json_item, "tm_mon");
+        json_t *json_year = json_object_get(json_item, "tm_year");
+        json_t *json_wday = json_object_get(json_item, "tm_wday");
+        json_t *json_yday = json_object_get(json_item, "tm_yday");
+        json_t *json_isdst = json_object_get(json_item, "tm_isdst");
         json_t *json_cat = json_object_get(json_item, "category");
         json_t *json_rec = json_object_get(json_item, "recurrent");
         json_t *json_stat = json_object_get(json_item, "status");
@@ -75,7 +84,15 @@ void load(ToDoList *todo_list, const char *filename) {
             json_is_string(json_name) &&
             json_is_string(json_desc) &&
             json_is_integer(json_prio) &&
-            json_is_integer(json_due) &&
+            json_is_integer(json_sec) &&
+            json_is_integer(json_min) &&
+            json_is_integer(json_hour) &&
+            json_is_integer(json_mday) &&
+            json_is_integer(json_mon) &&
+            json_is_integer(json_year) &&
+            json_is_integer(json_wday) &&
+            json_is_integer(json_yday) &&
+            json_is_integer(json_isdst) &&
             json_is_string(json_cat) &&
             json_is_integer(json_rec) &&
             json_is_integer(json_stat) &&
@@ -85,7 +102,17 @@ void load(ToDoList *todo_list, const char *filename) {
             new_task.name = strdup(json_string_value(json_name));
             new_task.description = strdup(json_string_value(json_desc));
             new_task.priority = (int)json_integer_value(json_prio);
-            new_task.due = (int)json_integer_value(json_due);
+            struct tm date = {0};
+            date.tm_sec = (int)json_integer_value(json_sec);
+            date.tm_min = (int)json_integer_value(json_min);
+            date.tm_hour = (int)json_integer_value(json_hour);
+            date.tm_mday = (int)json_integer_value(json_mday);
+            date.tm_mon = (int)json_integer_value(json_mon);
+            date.tm_year = (int)json_integer_value(json_year);
+            date.tm_wday = (int)json_integer_value(json_wday);
+            date.tm_yday = (int)json_integer_value(json_yday);
+            date.tm_isdst = (int)json_integer_value(json_isdst);
+            new_task.due = mktime(&date);
             new_task.category = strdup(json_string_value(json_cat));
             new_task.recurrent = (int)json_integer_value(json_rec);
             new_task.status = (int)json_integer_value(json_stat);
@@ -142,7 +169,16 @@ void save(Task *task, const char *filename) {
     json_object_set_new(json_task, "name", json_string(task->name));
     json_object_set_new(json_task, "description", json_string(task->description));
     json_object_set_new(json_task, "priority", json_integer(task->priority));
-    json_object_set_new(json_task, "due", json_integer(task->due));
+    struct tm *date = localtime(&(task->due));
+    json_object_set_new(json_task, "tm_sec",   json_integer(date->tm_sec));
+    json_object_set_new(json_task, "tm_min",   json_integer(date->tm_min));
+    json_object_set_new(json_task, "tm_hour",  json_integer(date->tm_hour));
+    json_object_set_new(json_task, "tm_mday",   json_integer(date->tm_mday));
+    json_object_set_new(json_task, "tm_mon",   json_integer(date->tm_mon));
+    json_object_set_new(json_task, "tm_year",  json_integer(date->tm_year));
+    json_object_set_new(json_task, "tm_wday",   json_integer(date->tm_wday));
+    json_object_set_new(json_task, "tm_yday",   json_integer(date->tm_yday));
+    json_object_set_new(json_task, "tm_isdst",  json_integer(date->tm_isdst));
     json_object_set_new(json_task, "category", json_string(task->category));
     json_object_set_new(json_task, "recurrent", json_integer(task->recurrent));
     json_object_set_new(json_task, "status", json_integer(task->status));

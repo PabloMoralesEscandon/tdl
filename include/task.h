@@ -2,6 +2,7 @@
 #define TASK_H
 
 #include <stdlib.h>
+#include <time.h>
 
 #define NAME_CHARS 21
 #define DESC_CHARS 201
@@ -42,7 +43,7 @@ typedef struct{
     char *name;
     char *description;
     int priority;
-    int due;
+    time_t due;
     int recurrent;
     int status;
     char *category;
