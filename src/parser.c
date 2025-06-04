@@ -38,9 +38,9 @@ char *parse_words(int argc, char **argv){
     }
     if(size>NAME_CHARS){
         printf("Name is too long\n");
-        return 0;
+        return NULL;
     }
-    if(!size) return "";
+    if(!size) return NULL;
     char *words=malloc(size);
     if(i>2) strcpy(words, argv[2]);
     for(int n=3; n<i; n++){
@@ -357,15 +357,15 @@ int cmd_list(char *options[], int id) {
 
     print_task_table_header();
     for (int i = 0; i < to_do_list.n_items; i++) {
-        if((id!=-1) && (to_do_list.items[i].id!=id)) break;
-       // if(options[PRIORITY] && (to_do_list.items[i].priority!=options[PRIORITY])) break;
-       // if(options[RECURRENT] && (to_do_list.items[i].recurrent!=options[RECURRENT])) break;
-      //  if(options[DUE] && (to_do_list.items[i].due!=options[DUE])) break;
-       // if((options[STATUS] && (to_do_list.items[i].status!=options[STATUS])) || (!options[STATUS] && (to_do_list.items[i].status==DONE))) break;
-        if(options[CATEGORY] && (to_do_list.items[i].category!=options[CATEGORY])) break;
-        if(options[PROJECT] && (to_do_list.items[i].project!=options[PROJECT])) break;
-        if(options[NAME] && (to_do_list.items[i].name!=options[NAME])) break;
-        if(options[DESC] && (to_do_list.items[i].description!=options[DESC])) break;
+        if((id!=-1) && (to_do_list.items[i].id!=id)) continue;
+        if(options[PRIORITY] && (to_do_list.items[i].priority!=get_priority_int(options[PRIORITY]))) continue;
+        if(options[RECURRENT] && (to_do_list.items[i].recurrent!=get_recurrence_int(options[RECURRENT]))) continue;
+    //    if(options[DUE] && (to_do_list.items[i].due!=options[DUE])) continue;
+        if((options[STATUS] && (to_do_list.items[i].status!=get_status_int(options[STATUS]))) || (!options[STATUS] && (to_do_list.items[i].status==DONE))) continue;
+        if(options[CATEGORY] && (strcmp(to_do_list.items[i].category, options[CATEGORY]))) continue;
+        if(options[PROJECT] && (strcmp(to_do_list.items[i].project,options[PROJECT]))) continue;
+        if(options[NAME] && (strcmp(to_do_list.items[i].name, options[NAME]))) continue;
+        if(options[DESC] && (strcmp(to_do_list.items[i].description, options[DESC]))) continue; // Change to strcmp
         print_task_table_row(&to_do_list.items[i]);
     }
     return 0;

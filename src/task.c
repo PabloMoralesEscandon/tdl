@@ -17,50 +17,10 @@ void print_task(Task *task){
     if(strcmp("none", task->description))
         printf("Description: %s\n", task->description);
     printf("Priority: %d\n", task->priority);
-    switch(task->priority){
-        case 0:
-            printf("Priority: Low\n");
-            break;
-        case 1:
-            printf("Priority: Medium\n");
-            break;
-        case 2:
-            printf("Priority: High\n");
-            break;
-        case 3:
-            printf("Priority: URGENT\n");
-            break;
-
-    }
+    printf("%s.\n", get_priority(task->priority));
     if(task->due!=-1) printf("Due: %d\n", task->due);
-    switch(task->recurrent){
-        case 0:
-            break;
-        case 1:
-            printf("Daily.\n");
-            break;
-        case 2:
-            printf("Weekly.\n");
-            break;
-        case 3:
-            printf("Monthly\n");
-            break;
-        case 4:
-            printf("Yearly\n");
-            break;
-
-    }
-    switch(task->status){
-        case TODO:
-            printf("To do.\n");
-            break;
-        case IN_PROGRESS:
-            printf("In progress.\n");
-            break;
-        case DONE:
-            printf("Done.\n");
-            break;
-    }
+    printf("%s.\n", get_recurrence(task->recurrent));
+    printf("%s.\n", get_priority(task->status));
     printf("Category: %s\n", task->category ? task->category : "(none)");
     printf("Project: %s\n", task->project ? task->project : "(none)");
 }
@@ -79,6 +39,16 @@ char *get_priority(int priority){
     }
 }
 
+int get_priority_int(char *priority){
+    if(!strcmp(priority, "low")) return LOW;
+        else if(!strcmp(priority, "medium")) return MEDIUM;
+        else if(!strcmp(priority, "high")) return HIGH;
+        else if(!strcmp(priority, "urgent")) return URGENT;
+        else{
+            return -1;
+        }
+}
+
 char *get_recurrence(int recurrence){
     switch(recurrence){
         case NO:
@@ -95,6 +65,16 @@ char *get_recurrence(int recurrence){
     }
 }
 
+int get_recurrence_int(char *recurrence){
+    if(!strcmp(recurrence, "daily")) return DAILY;
+        else if(!strcmp(recurrence, "weekly")) return WEEKLY;
+        else if(!strcmp(recurrence, "monthly")) return MONTHLY;
+        else if(!strcmp(recurrence, "yearly")) return YEARLY;
+        else{
+            return -1;
+        }
+}
+
 char *get_status(int status){
     switch(status){
         case TODO:
@@ -104,4 +84,13 @@ char *get_status(int status){
         case DONE:
             return "Done";
     }
+}
+
+int get_status_int(char *status){
+    if(!strcmp(status, "To do")) return TODO;
+        else if(!strcmp(status, "In progress")) return IN_PROGRESS;
+        else if(!strcmp(status, "Done")) return DONE;
+        else{
+            return -1;
+        }
 }

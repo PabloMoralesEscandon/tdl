@@ -77,8 +77,14 @@ void print_task(Task *task);
 
 char *get_priority(int priority);
 
+int get_priority_int(char *priority);
+
 char *get_recurrence(int recurrence);
 
+int get_recurrence_int(char *recurrence);
+
 char *get_status(int status);
+
+int get_status_int(char *status);
 
 #endif

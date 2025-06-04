@@ -9,8 +9,9 @@ int main (int argc, char **argv) {
     char *command = argv[1];
     char *options[NUMBER_OPT] = {0};
     char *words = parse_words(argc, argv);
-    int id = parse_id_name(words);
-    if(id==-1) options[NAME] = strdup(words);
+    int id = -1;
+    if(words!= NULL) id = parse_id_name(words);
+    if((id==-1) && (words!= NULL)) options[NAME] = strdup(words);
     parse_options(argc, argv, options);
     return dispatch_command(command, options, id);
 }
