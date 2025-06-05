@@ -88,4 +88,6 @@ char *get_status(int status);
 
 int get_status_int(char *status);
 
+int is_valid_date(struct tm date);
+
 #endif

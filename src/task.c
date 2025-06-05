@@ -94,3 +94,18 @@ int get_status_int(char *status){
             return -1;
         }
 }
+
+int is_leap_year(int year){
+    return (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0);
+}
+
+int is_valid_date(struct tm date){
+    int day = date.tm_mday;
+    int month = date.tm_mon;
+    int year = date.tm_year;
+    if (year < 1) return 0;
+    if (month < 1 || month > 12) return 0;
+    int daysInMonth[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+    if (month == 2 && is_leap_year(year)) daysInMonth[1] = 29;
+    return (day >= 1 && day <= daysInMonth[month - 1]);
+}

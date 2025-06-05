@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
+#include <time.h>
 
 #include "task.h"
 #include "memory.h"
@@ -155,7 +156,31 @@ int cmd_add(char *options[], int id){
         }
     } else new_task.recurrent = NO;
     if(options[DUE]){
-        // Add logic
+        struct tm date = {0};
+        printf("%d\n", (strlen(options[DUE]) == 10));
+        printf("%d\n", (isdigit(options[DUE][0])));
+        printf("%d\n", (isdigit(options[DUE][3]) && isdigit(options[DUE][4])));
+        printf("%d\n", (isdigit(options[DUE][6]) && isdigit(options[DUE][7])));
+        printf("%d\n", (isdigit(options[DUE][8]) && isdigit(options[DUE][9])));
+        printf("%d\n", ((options[DUE][2] == options[DUE][5]) && (options[DUE][2] == '-')));
+        if( (strlen(options[DUE]) == 10)
+            && (isdigit(options[DUE][0]) && isdigit(options[DUE][1]))
+            && (isdigit(options[DUE][3]) && isdigit(options[DUE][4]))
+            && (isdigit(options[DUE][6]) && isdigit(options[DUE][7]))
+            && (isdigit(options[DUE][8]) && isdigit(options[DUE][9]))
+            && ((options[DUE][2] == options[DUE][5]) && (options[DUE][2] == '-'))
+        ){
+            date.tm_mday = (options[DUE][0] - '0') * 10 + (options[DUE][1] - '0');
+            date.tm_mon = (options[DUE][3] - '0') * 10 + (options[DUE][4] - '0');
+            date.tm_year = (options[DUE][6] - '0') * 10 + (options[DUE][7] - '0');
+            date.tm_year += (options[DUE][0] - '0') * 1000 + (options[DUE][1] - '0') * 100;
+        } else{
+            printf("Failed to parse date or invalid format.\n");
+            return 0;
+        }
+        if(is_valid_date(date)){
+            new_task.due = mktime(&date);
+        }
     } else new_task.due = 0;
     if(options[PROJECT]){
         // Add logic
@@ -341,11 +366,14 @@ void print_task_table_header() {
 }
 
 void print_task_table_row(Task *t) {
-    printf("%-5d %-15s %-10s %-8d %-10s %-10s %-15s %-15s %-15s\n",
+    struct tm *tm_info = localtime(&(t->due));
+    char buffer[8];
+    strftime(buffer, sizeof(buffer), "%Y-%m-%d", tm_info);
+    printf("%-5d %-15s %-10s %-8s %-10s %-10s %-15s %-15s %-15s\n",
            t->id,
            t->name ? t->name : "(none)",
            get_priority(t->priority),
-           t->due,
+           buffer,
            get_recurrence(t->recurrent),
            get_status(t->status),
            t->category ? t->category : "(none)",
