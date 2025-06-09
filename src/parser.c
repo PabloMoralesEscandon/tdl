@@ -157,12 +157,6 @@ int cmd_add(char *options[], int id){
     } else new_task.recurrent = NO;
     if(options[DUE]){
         struct tm date = {0};
-        printf("%d\n", (strlen(options[DUE]) == 10));
-        printf("%d\n", (isdigit(options[DUE][0])));
-        printf("%d\n", (isdigit(options[DUE][3]) && isdigit(options[DUE][4])));
-        printf("%d\n", (isdigit(options[DUE][6]) && isdigit(options[DUE][7])));
-        printf("%d\n", (isdigit(options[DUE][8]) && isdigit(options[DUE][9])));
-        printf("%d\n", ((options[DUE][2] == options[DUE][5]) && (options[DUE][2] == '-')));
         if( (strlen(options[DUE]) == 10)
             && (isdigit(options[DUE][0]) && isdigit(options[DUE][1]))
             && (isdigit(options[DUE][3]) && isdigit(options[DUE][4]))
@@ -172,8 +166,8 @@ int cmd_add(char *options[], int id){
         ){
             date.tm_mday = (options[DUE][0] - '0') * 10 + (options[DUE][1] - '0');
             date.tm_mon = (options[DUE][3] - '0') * 10 + (options[DUE][4] - '0');
-            date.tm_year = (options[DUE][6] - '0') * 10 + (options[DUE][7] - '0');
-            date.tm_year += (options[DUE][0] - '0') * 1000 + (options[DUE][1] - '0') * 100;
+            date.tm_year = (options[DUE][8] - '0') * 10 + (options[DUE][9] - '0');
+            date.tm_year += (options[DUE][6] - '0') * 1000 + (options[DUE][7] - '0') * 100;
         } else{
             printf("Failed to parse date or invalid format.\n");
             return 0;
@@ -361,15 +355,16 @@ int cmd_show(char *options[], int id){
 }
 
 void print_task_table_header() {
-    printf("%-5s %-15s %-10s %-8s %-10s %-10s %-15s %-15s %-15s\n",
+    printf("%-5s %-15s %-10s %-12s %-10s %-10s %-15s %-15s %-15s\n",
            "ID", "Name", "Priority", "Due", "Recurrent", "Status", "Category", "Project", "Description");
 }
 
+// Move to task.c
 void print_task_table_row(Task *t) {
     struct tm *tm_info = localtime(&(t->due));
-    char buffer[8];
-    strftime(buffer, sizeof(buffer), "%Y-%m-%d", tm_info);
-    printf("%-5d %-15s %-10s %-8s %-10s %-10s %-15s %-15s %-15s\n",
+    char buffer[11];
+    strftime(buffer, sizeof(buffer), "%d-%m-%Y", tm_info);
+    printf("%-5d %-15s %-10s %-12s %-10s %-10s %-15s %-15s %-15s\n",
            t->id,
            t->name ? t->name : "(none)",
            get_priority(t->priority),
