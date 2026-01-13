@@ -16,11 +16,9 @@ void print_task(Task *task){
     printf("Name: %s\n", task->name);
     if(strcmp("none", task->description))
         printf("Description: %s\n", task->description);
-    printf("Priority: %d\n", task->priority);
-    printf("%s.\n", get_priority(task->priority));
+    printf("Priority: %s.\n", get_priority(task->priority));
     if(task->due!=-1) printf("Due: %d\n", task->due);
-    printf("%s.\n", get_recurrence(task->recurrent));
-    printf("%s.\n", get_priority(task->status));
+    if(task->recurrent!=NO) printf("%s.\n", get_recurrence(task->recurrent));
     printf("Category: %s\n", task->category ? task->category : "(none)");
     printf("Project: %s\n", task->project ? task->project : "(none)");
 }
