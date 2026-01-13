@@ -16,8 +16,11 @@ void print_task(Task *task){
     printf("Name: %s\n", task->name);
     if(strcmp("none", task->description))
         printf("Description: %s\n", task->description);
-    printf("Priority: %s.\n", get_priority(task->priority));
-    if(task->due!=-1) printf("Due: %d\n", task->due);
+    printf("Priority: %s.\n", get_priority(task->priority));    
+    struct tm *tm_info = localtime(&(task->due));
+    char buffer[11];
+    strftime(buffer, sizeof(buffer), "%d-%m-%Y", tm_info);
+    printf("Due: %s\n", buffer);
     if(task->recurrent!=NO) printf("%s.\n", get_recurrence(task->recurrent));
     printf("Category: %s\n", task->category ? task->category : "(none)");
     printf("Project: %s\n", task->project ? task->project : "(none)");
@@ -33,18 +36,19 @@ char *get_priority(int priority){
             return "High";
         case URGENT:
             return "URGENT";
-
+	default:
+	    return "?";
     }
 }
 
 int get_priority_int(char *priority){
     if(!strcmp(priority, "low")) return LOW;
-        else if(!strcmp(priority, "medium")) return MEDIUM;
-        else if(!strcmp(priority, "high")) return HIGH;
-        else if(!strcmp(priority, "urgent")) return URGENT;
-        else{
-            return -1;
-        }
+    else if(!strcmp(priority, "medium")) return MEDIUM;
+    else if(!strcmp(priority, "high")) return HIGH;
+    else if(!strcmp(priority, "urgent")) return URGENT;
+    else{
+           return -1;
+    }
 }
 
 char *get_recurrence(int recurrence){
@@ -59,18 +63,20 @@ char *get_recurrence(int recurrence){
             return "Monthly";
         case YEARLY:
             return "Yearly";
+	default:
+	    return "?";
 
     }
 }
 
 int get_recurrence_int(char *recurrence){
     if(!strcmp(recurrence, "daily")) return DAILY;
-        else if(!strcmp(recurrence, "weekly")) return WEEKLY;
-        else if(!strcmp(recurrence, "monthly")) return MONTHLY;
-        else if(!strcmp(recurrence, "yearly")) return YEARLY;
-        else{
-            return -1;
-        }
+    else if(!strcmp(recurrence, "weekly")) return WEEKLY;
+    else if(!strcmp(recurrence, "monthly")) return MONTHLY;
+    else if(!strcmp(recurrence, "yearly")) return YEARLY;
+    else{
+        return -1;
+    }
 }
 
 char *get_status(int status){
@@ -81,16 +87,18 @@ char *get_status(int status){
             return "In progress";
         case DONE:
             return "Done";
+	default:
+	    return "?";
     }
 }
 
 int get_status_int(char *status){
     if(!strcmp(status, "To do")) return TODO;
-        else if(!strcmp(status, "In progress")) return IN_PROGRESS;
-        else if(!strcmp(status, "Done")) return DONE;
-        else{
-            return -1;
-        }
+    else if(!strcmp(status, "In progress")) return IN_PROGRESS;
+    else if(!strcmp(status, "Done")) return DONE;
+    else{
+	return -1;
+    }
 }
 
 int is_leap_year(int year){

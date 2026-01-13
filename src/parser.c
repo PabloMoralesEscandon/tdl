@@ -168,13 +168,17 @@ int cmd_add(char *options[], int id){
             date.tm_mon = (options[DUE][3] - '0') * 10 + (options[DUE][4] - '0');
             date.tm_year = (options[DUE][8] - '0') * 10 + (options[DUE][9] - '0');
             date.tm_year += (options[DUE][6] - '0') * 1000 + (options[DUE][7] - '0') * 100;
-        } else{
-            printf("Failed to parse date or invalid format.\n");
+	    date.tm_year-=1900;
+	} else{
+            printf("Failed to parse date or invalid format. Make sure date is in format DD-MM-YYYY.\n");
             return 0;
         }
         if(is_valid_date(date)){
             new_task.due = mktime(&date);
-        }
+        } else{
+            printf("Failed to parse date or invalid format. Make sure date is in format DD-MM-YYYY.\n");
+            return 0;
+	}
     } else new_task.due = 0;
     if(options[PROJECT]){
         // Add logic
@@ -183,7 +187,11 @@ int cmd_add(char *options[], int id){
         new_task.category = options[CATEGORY];
     } else new_task.category = "none";
     if(options[DESC]){
-        new_task.description = options[DESC];
+        if ((strlen(options[DESC])+1) > DESC_CHARS) {
+            printf("Description is too long. Max %d characters.\n", DESC_CHARS);
+            return 1;
+        }
+        new_task.description = strdup(options[DESC]);
     } else new_task.description = "none";
     append(to_do_list, new_task);
     save(&new_task, FILE_NAME);
@@ -357,8 +365,8 @@ int cmd_show(char *options[], int id){
 }
 
 void print_task_table_header() {
-    printf("%-5s %-15s %-10s %-12s %-10s %-10s %-15s %-15s %-15s\n",
-           "ID", "Name", "Priority", "Due", "Recurrent", "Status", "Category", "Project", "Description");
+    printf("%-5s %-20s %-10s %-12s %-10s %-15s %-15s %-15s\n",
+           "ID", "Name", "Priority", "Due", "Recurrent", "Status", "Category", "Project");
 }
 
 // Move to task.c
@@ -366,7 +374,7 @@ void print_task_table_row(Task *t) {
     struct tm *tm_info = localtime(&(t->due));
     char buffer[11];
     strftime(buffer, sizeof(buffer), "%d-%m-%Y", tm_info);
-    printf("%-5d %-15s %-10s %-12s %-10s %-10s %-15s %-15s %-15s\n",
+    printf("%-5d %-20s %-10s %-12s %-10s %-15s %-15s %-15s\n",
            t->id,
            t->name ? t->name : "(none)",
            get_priority(t->priority),
@@ -374,8 +382,7 @@ void print_task_table_row(Task *t) {
            get_recurrence(t->recurrent),
            get_status(t->status),
            t->category ? t->category : "(none)",
-           t->project ? t->project : "(none)",
-           t->description ? t->description : "(none)");
+           t->project ? t->project : "(none)");
 }
 
 int cmd_list(char *options[], int id) {
