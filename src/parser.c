@@ -386,8 +386,12 @@ void print_task_table_row(Task *t) {
 }
 
 int cmd_list(char *options[], int id) {
-
+    set_bg256(230);
+    set_fg256(232);
+    term_bold_on();
     print_task_table_header();
+    term_bold_off();
+    printf(RESET);
     for (int i = 0; i < to_do_list.n_items; i++) {
         if((id!=-1) && (to_do_list.items[i].id!=id)) continue;
         if(options[PRIORITY] && (to_do_list.items[i].priority!=get_priority_int(options[PRIORITY]))) continue;
@@ -397,8 +401,19 @@ int cmd_list(char *options[], int id) {
         if(options[CATEGORY] && (strcmp(to_do_list.items[i].category, options[CATEGORY]))) continue;
         if(options[PROJECT] && (strcmp(to_do_list.items[i].project,options[PROJECT]))) continue;
         if(options[NAME] && (strcmp(to_do_list.items[i].name, options[NAME]))) continue;
-        if(options[DESC] && (strcmp(to_do_list.items[i].description, options[DESC]))) continue; // Change to strcmp
+        if(options[DESC] && (strcmp(to_do_list.items[i].description, options[DESC]))) continue;
+	int bg;
+	if(i%2){
+	    bg = 235;
+	}else bg = 237;
+	set_bg256(bg);
         print_task_table_row(&to_do_list.items[i]);
+	printf(RESET);
     }
     return 0;
 }
+
+static void set_bg256(int n) { printf(ESC "48;5;%dm", n); }
+static void set_fg256(int n) { printf(ESC "38;5;%dm", n); }
+static inline void term_bold_on(void)  { fputs("\x1b[1m", stdout); }   // bold on [web:14]
+static inline void term_bold_off(void) { fputs("\x1b[22m", stdout); }

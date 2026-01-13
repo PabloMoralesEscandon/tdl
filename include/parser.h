@@ -3,6 +3,9 @@
 
 #define NUMBER_OPT 8
 
+#define ESC "\x1b["
+#define RESET ESC "0m"
+
 #define PRIORITY    0
 #define RECURRENT   1
 #define DUE         2
@@ -42,5 +45,11 @@ int cmd_done(char *options[], int id);
 int cmd_show(char *options[], int id);
 
 int cmd_list(char *options[], int id);
+
+
+static void set_bg256(int n);
+static void set_fg256(int n);
+static inline void term_bold_on(void);
+static inline void term_bold_off(void);
 
 #endif
