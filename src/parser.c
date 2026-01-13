@@ -342,6 +342,8 @@ int cmd_show(char *options[], int id){
                 return(0);
             }
         }
+	printf("No task with id %d\n", id);
+	return 1;
 
     }
     for(int i=0; i<to_do_list.n_items; i++){
