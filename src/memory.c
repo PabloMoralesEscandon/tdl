@@ -7,25 +7,6 @@
 #include "task.h"
 #include "utils.h"
 
-// Assuming ToDoList and Task are defined something like this:
-// typedef struct {
-//     int id;
-//     char *name;
-//     char *description;
-//     int priority;
-//     int due;
-//     char *category;
-//     int recurrent;
-//     int status;
-//     char *project;
-// } Task;
-//
-// typedef struct {
-//     Task *items;
-//     size_t n_items;
-//     size_t capacity;
-// } ToDoList;
-
 void load(ToDoList *todo_list, const char *filename) {
     // Open the file for reading
     FILE *file = fopen(filename, "r");
@@ -117,6 +98,7 @@ void load(ToDoList *todo_list, const char *filename) {
             new_task.recurrent = (int)json_integer_value(json_rec);
             new_task.status = (int)json_integer_value(json_stat);
             new_task.project = strdup(json_string_value(json_pro));
+	    new_task.value = -(new_task.priority + when_due(new_task.due));
         } else {
             fprintf(stderr, "Invalid or missing fields in item %zu\n", i);
             // Initialize with defaults or skip
@@ -129,6 +111,7 @@ void load(ToDoList *todo_list, const char *filename) {
             new_task.recurrent = 0;
             new_task.status = 0;
             new_task.project = strdup("");
+	    new_task.value = 0;
         }
         append(to_do_list, new_task);
     }

@@ -107,11 +107,25 @@ int is_leap_year(int year){
 
 int is_valid_date(struct tm date){
     int day = date.tm_mday;
-    int month = date.tm_mon;
-    int year = date.tm_year;
+    int month = date.tm_mon + 1;
+    int year = date.tm_year + 1900;
     if (year < 1) return 0;
     if (month < 1 || month > 12) return 0;
     int daysInMonth[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
     if (month == 2 && is_leap_year(year)) daysInMonth[1] = 29;
     return (day >= 1 && day <= daysInMonth[month - 1]);
+}
+
+
+double second_until(time_t target){
+    time_t now = time(NULL);
+    return difftime(target, now);  // target - now, in seconds
+}
+
+int when_due(time_t target){
+    double seconds = second_until(target);
+    if(seconds<(60*60*24)) return DAY;
+    if(seconds<(60*60*24*7)) return WEEK;
+    if(seconds<(60*60*24*30)) return MONTH;
+    return LATER;
 }

@@ -28,6 +28,13 @@ enum Recurrent{
     YEARLY
 };
 
+enum Due{
+    LATER,
+    MONTH,
+    WEEK,
+    DAY
+};
+
 #define append(da, element)\
     do{\
         if(da.n_items >= da.size){\
@@ -48,7 +55,7 @@ typedef struct{
     int status;
     char *category;
     char *project;
-
+    int value;
 } Task;
 
 typedef struct{
@@ -89,5 +96,9 @@ char *get_status(int status);
 int get_status_int(char *status);
 
 int is_valid_date(struct tm date);
+
+double second_until(time_t target);
+
+int when_due(time_t target);
 
 #endif

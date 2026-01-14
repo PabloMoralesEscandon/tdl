@@ -10,6 +10,14 @@ void sort_list(Task *disordered, int low, int high){
     }
 }
 
+void sort_list_value(Task *disordered, int low, int high){
+    if(low < high){
+        int separator = partition_value(disordered, low, high);
+        sort_list_value(disordered, low, separator);
+        sort_list_value(disordered, separator+1, high);
+    }
+}
+
 int partition(Task *disordered, int low, int high){
     int i,j;
     i = low - 1;
@@ -22,6 +30,26 @@ int partition(Task *disordered, int low, int high){
         do {
             j--;
         } while(disordered[j].id > pivot);
+        if(i >= j) return j;
+        Task temp = disordered[i];
+        disordered[i] = disordered[j];
+        disordered[j] = temp;
+    }
+}
+
+
+int partition_value(Task *disordered, int low, int high){
+    int i,j;
+    i = low - 1;
+    j= high + 1;
+    int pivot = disordered[low].value;
+    while(1){
+        do {
+            i++;
+        } while(disordered[i].value < pivot);
+        do {
+            j--;
+        } while(disordered[j].value > pivot);
         if(i >= j) return j;
         Task temp = disordered[i];
         disordered[i] = disordered[j];

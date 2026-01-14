@@ -8,6 +8,7 @@
 
 #include "task.h"
 #include "memory.h"
+#include "utils.h"
 
 Command commands[] = {
     {"add",    cmd_add},
@@ -165,7 +166,7 @@ int cmd_add(char *options[], int id){
             && ((options[DUE][2] == options[DUE][5]) && (options[DUE][2] == '-'))
         ){
             date.tm_mday = (options[DUE][0] - '0') * 10 + (options[DUE][1] - '0');
-            date.tm_mon = (options[DUE][3] - '0') * 10 + (options[DUE][4] - '0');
+            date.tm_mon = (options[DUE][3] - '0') * 10 + (options[DUE][4] - '0')-1;
             date.tm_year = (options[DUE][8] - '0') * 10 + (options[DUE][9] - '0');
             date.tm_year += (options[DUE][6] - '0') * 1000 + (options[DUE][7] - '0') * 100;
 	    date.tm_year-=1900;
@@ -386,6 +387,7 @@ void print_task_table_row(Task *t) {
 }
 
 int cmd_list(char *options[], int id) {
+    sort_list_value(to_do_list.items, 0, to_do_list.n_items-1); 
     set_bg256(230);
     set_fg256(232);
     term_bold_on();
