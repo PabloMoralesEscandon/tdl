@@ -6,6 +6,7 @@
 
 int main (int argc, char **argv) {
     load(&to_do_list, FILE_NAME);
+    update_recurrent(FILE_NAME);
     char *command = argv[1];
     char *options[NUMBER_OPT] = {0};
     char *words = parse_words(argc, argv);

@@ -123,6 +123,7 @@ double second_until(time_t target){
 }
 
 int when_due(time_t target){
+    if(target == 0) return LATER;
     double seconds = second_until(target);
     if(seconds<(60*60*24)) return DAY;
     if(seconds<(60*60*24*7)) return WEEK;

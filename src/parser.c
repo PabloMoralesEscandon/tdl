@@ -374,7 +374,11 @@ void print_task_table_header() {
 void print_task_table_row(Task *t) {
     struct tm *tm_info = localtime(&(t->due));
     char buffer[11];
-    strftime(buffer, sizeof(buffer), "%d-%m-%Y", tm_info);
+    if(!(t->due)){ 	
+	snprintf(buffer,sizeof buffer, "-");
+    }else {
+	strftime(buffer, sizeof(buffer), "%d-%m-%Y", tm_info);
+    }
     printf("%-5d %-20s %-10s %-12s %-10s %-15s %-15s %-15s\n",
            t->id,
            t->name ? t->name : "(none)",

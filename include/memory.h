@@ -9,4 +9,6 @@ void save(Task *task, const char *filename);
 
 int delete_task(const char *filename, int target_id);
 
+void update_recurrent(const char* filename);
+
 #endif

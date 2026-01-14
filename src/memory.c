@@ -237,3 +237,34 @@ int delete_task(const char *filename, int target_id) {
     json_decref(root);
     return 0;
 }
+
+void update_recurrent(const char* filename){
+    for(int i=0; i<to_do_list.n_items; i++){
+	if(to_do_list.items[i].recurrent && to_do_list.items[i].status == DONE && (second_until(to_do_list.items[i].due) < 0)){
+	    struct tm time = *localtime(&to_do_list.items[i].due);
+	    switch(to_do_list.items[i].recurrent){
+		case DAILY:
+		    time.tm_mday +=1;
+		    to_do_list.items[i].due = mktime(&time);
+		    break;
+		case WEEKLY: 
+		    time.tm_mday +=7;
+		    to_do_list.items[i].due = mktime(&time);
+		    break;		
+		case MONTHLY:
+		    time.tm_mon +=1;
+		    to_do_list.items[i].due = mktime(&time);
+		    break;
+		case YEARLY:
+		    time.tm_year +=1;
+		    to_do_list.items[i].due = mktime(&time);
+		    break;
+	     }
+	    to_do_list.items[i].status = TODO;
+	    delete_task(filename, i);
+	    save(&to_do_list.items[i], filename);
+
+	}
+    }
+}
+
