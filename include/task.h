@@ -30,6 +30,7 @@ enum Recurrent{
 
 enum Due{
     LATER,
+    YEAR,
     MONTH,
     WEEK,
     DAY

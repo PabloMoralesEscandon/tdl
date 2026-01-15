@@ -128,5 +128,6 @@ int when_due(time_t target){
     if(seconds<(60*60*24)) return DAY;
     if(seconds<(60*60*24*7)) return WEEK;
     if(seconds<(60*60*24*30)) return MONTH;
+    if(seconds<(60*60*24*30*12)) return YEAR;
     return LATER;
 }

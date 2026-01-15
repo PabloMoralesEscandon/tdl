@@ -402,8 +402,21 @@ int cmd_list(char *options[], int id) {
         if((id!=-1) && (to_do_list.items[i].id!=id)) continue;
         if(options[PRIORITY] && (to_do_list.items[i].priority!=get_priority_int(options[PRIORITY]))) continue;
         if(options[RECURRENT] && (to_do_list.items[i].recurrent!=get_recurrence_int(options[RECURRENT]))) continue;
-    //    if(options[DUE] && (to_do_list.items[i].due!=options[DUE])) continue;
-        if((options[STATUS] && (to_do_list.items[i].status!=get_status_int(options[STATUS]))) || (!options[STATUS] && (to_do_list.items[i].status==DONE))) continue;
+        if(options[DUE]){
+	    if(!strcmp(options[DUE], "today")){
+		if(when_due(to_do_list.items[i].due) != DAY) continue;
+	    }
+	    if(!strcmp(options[DUE], "week")){
+		if(when_due(to_do_list.items[i].due) < WEEK) continue;
+	    }
+	    if(!strcmp(options[DUE], "month")){
+		if(when_due(to_do_list.items[i].due) < MONTH) continue;
+	    }
+	    if(!strcmp(options[DUE], "year")){
+		if(when_due(to_do_list.items[i].due) < YEAR) continue;
+	    }
+	}
+	if((options[STATUS] && (to_do_list.items[i].status!=get_status_int(options[STATUS]))) || (!options[STATUS] && (to_do_list.items[i].status==DONE))) continue;
         if(options[CATEGORY] && (strcmp(to_do_list.items[i].category, options[CATEGORY]))) continue;
         if(options[PROJECT] && (strcmp(to_do_list.items[i].project,options[PROJECT]))) continue;
         if(options[NAME] && (strcmp(to_do_list.items[i].name, options[NAME]))) continue;
