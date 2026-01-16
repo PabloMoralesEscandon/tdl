@@ -246,18 +246,37 @@ void update_recurrent(const char* filename){
 		case DAILY:
 		    time.tm_mday +=1;
 		    to_do_list.items[i].due = mktime(&time);
+		    while(second_until(to_do_list.items[i].due) < 0){
+			time.tm_mday +=1;
+			to_do_list.items[i].due = mktime(&time);
+		    }
 		    break;
 		case WEEKLY: 
 		    time.tm_mday +=7;
 		    to_do_list.items[i].due = mktime(&time);
+		    while(second_until(to_do_list.items[i].due) < 0){
+			time.tm_mday +=7;
+			to_do_list.items[i].due = mktime(&time);
+		    }
+
 		    break;		
 		case MONTHLY:
 		    time.tm_mon +=1;
 		    to_do_list.items[i].due = mktime(&time);
+		    while(second_until(to_do_list.items[i].due) < 0){
+			time.tm_mon +=1;
+			to_do_list.items[i].due = mktime(&time);
+		    }
+
 		    break;
 		case YEARLY:
 		    time.tm_year +=1;
 		    to_do_list.items[i].due = mktime(&time);
+		    while(second_until(to_do_list.items[i].due) < 0){
+			time.tm_year +=1;
+			to_do_list.items[i].due = mktime(&time);
+		    }
+
 		    break;
 	     }
 	    to_do_list.items[i].status = TODO;
