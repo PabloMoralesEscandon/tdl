@@ -127,7 +127,14 @@ int when_due(time_t target){
     double seconds = second_until(target);
     if(seconds<(60*60*24)) return DAY;
     if(seconds<(60*60*24*7)) return WEEK;
-    if(seconds<(60*60*24*30)) return MONTH;
-    if(seconds<(60*60*24*30*12)) return YEAR;
+    time_t now = time(NULL);
+    struct tm time_now = *localtime(&now);
+    time_now.tm_mon+=1;
+    time_t time_1_mon = mktime(&time_now);
+    if((target < time_1_mon) && (target > now)) return MONTH;
+    time_now.tm_mon-=1;
+    time_now.tm_year+=1;
+    time_t time_1_year = mktime(&time_now);
+    if((target < time_1_year) && (target > now)) return YEAR;
     return LATER;
 }
