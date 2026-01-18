@@ -419,7 +419,7 @@ int cmd_list(char *options[], int id) {
 		if(when_due(to_do_list.items[i].due) < YEAR) continue;
 	    }
 	}
-	if((options[STATUS] && (to_do_list.items[i].status!=get_status_int(options[STATUS]))) || (!options[STATUS] && (to_do_list.items[i].status==DONE))) continue;
+	if((options[STATUS] && (to_do_list.items[i].status!=get_status_int(options[STATUS]))) || (!options[STATUS] && (to_do_list.items[i].status==DONE) && !options[PROJECT])) continue;
         if(options[CATEGORY] && (strcmp(to_do_list.items[i].category, options[CATEGORY]))) continue;
         if(options[PROJECT] && (strcmp(to_do_list.items[i].project,options[PROJECT]))) continue;
         if(options[NAME] && (strcmp(to_do_list.items[i].name, options[NAME]))) continue;
@@ -438,10 +438,10 @@ int cmd_list(char *options[], int id) {
     }
     if(options[PROJECT]){
 	printf("Project %s has %d tasks.\n", options[PROJECT], n);
-	printf("Project is %d%% done.\n", done/n);
 	int width = 20;
 	double percent = (double)done/n; 
 	int progress = (int)(percent * (double)width);
+	printf("Project is %.2f%% done.\n", percent*100.0);
 	for(int i=0; i<width; i++){
 	    if(i<progress){
 		printf("#");
