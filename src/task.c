@@ -5,8 +5,6 @@
 
 ToDoList to_do_list;
 
-ToDoProjects to_do_projects;
-
 void print_task(Task *task){
     if (task == NULL) {
         printf("Task is NULL\n");

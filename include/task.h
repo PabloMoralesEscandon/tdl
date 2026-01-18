@@ -60,27 +60,12 @@ typedef struct{
 } Task;
 
 typedef struct{
-    char *name;
-    Task *items;
-    size_t n_items;
-    size_t size;
-} Project;
-
-typedef struct{
     Task *items;
     size_t n_items;
     size_t size;
 } ToDoList;
 
-typedef struct{
-    Project *items;
-    size_t n_items;
-    size_t size;
-} ToDoProjects;
-
 extern ToDoList to_do_list;
-
-extern ToDoProjects to_do_projects;
 
 void print_task(Task *task);
 
