@@ -3,7 +3,7 @@
 
 #include "task.h"
 
-void load(ToDoList *todo_list, const char *filename);
+void load(const char *filename);
 
 void save(Task *task, const char *filename);
 

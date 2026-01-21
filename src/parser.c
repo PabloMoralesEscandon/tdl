@@ -183,6 +183,10 @@ int cmd_add(char *options[], int id){
 	}
     } else new_task.due = 0;
     if(options[PROJECT]){
+	if ((strlen(options[PROJECT])+1) > NAME_CHARS) {
+            printf("Project is too long. Max %d characters.\n", NAME_CHARS);
+            return 1;
+        }
 	new_task.project = strdup(options[PROJECT]);
     } else new_task.project = "none";
     if(options[CATEGORY]){
@@ -400,6 +404,7 @@ int cmd_list(char *options[], int id) {
     term_bold_off();
     printf(RESET);
     int n = 0;
+    int alternate = 0;
     int done = 0;
     for (int i = 0; i < to_do_list.n_items; i++) {
 
@@ -426,9 +431,10 @@ int cmd_list(char *options[], int id) {
         if(options[NAME] && (strcmp(to_do_list.items[i].name, options[NAME]))) continue;
         if(options[DESC] && (strcmp(to_do_list.items[i].description, options[DESC]))) continue;
 	int bg;
-	if(i%2){
+	if(alternate){
 	    bg = 235;
 	}else bg = 237;
+	alternate = !alternate;
 	set_bg256(bg);
         print_task_table_row(&to_do_list.items[i]);
 	printf(RESET);
@@ -453,7 +459,44 @@ int cmd_list(char *options[], int id) {
     return 0;
 }
 
+void print_proj_table_header() {
+    printf("%-5s %-20s %10s\n",
+           "ID", "Project", "Status");
+}
+
+// Move to task.c
+void print_proj_table_row(char *proj, int id) {
+    float tasks = 0;
+    float done = 0;
+    for(int i=0; i<to_do_list.n_items; i++){
+	if(!strcmp(to_do_list.items[i].project, proj)){
+	    tasks++;
+	    if(to_do_list.items[i].status == DONE) done++;
+	}
+    }
+    float percent = 100 * done / tasks;
+    printf("%-5d %-20s %9.2f%%\n",
+	id, proj, percent);
+}
+
 int cmd_list_projects(char *options[], int id){
+    set_bg256(230);
+    set_fg256(232);
+    term_bold_on();
+    print_proj_table_header();
+    term_bold_off();
+    printf(RESET);
+    int alternate = 0;
+    for(int i=0; i<to_do_proj.n_items; i++){
+	int bg;
+	if(alternate){
+	    bg = 235;
+	}else bg = 237;
+	alternate = !alternate;
+	set_bg256(bg);
+	print_proj_table_row(to_do_proj.items[i], i);
+	printf(RESET);
+    }
     return 0;
 }
 static void set_bg256(int n) { printf(ESC "48;5;%dm", n); }

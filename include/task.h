@@ -65,7 +65,16 @@ typedef struct{
     size_t size;
 } ToDoList;
 
+typedef struct{
+    char **items;
+    size_t n_items;
+    size_t size;
+} ToDoProjects;
+
+
 extern ToDoList to_do_list;
+
+extern ToDoProjects to_do_proj;
 
 void print_task(Task *task);
 
@@ -86,5 +95,7 @@ int is_valid_date(struct tm date);
 double second_until(time_t target);
 
 int when_due(time_t target);
+
+int is_in_proj_list(char *name);
 
 #endif

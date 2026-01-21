@@ -7,7 +7,7 @@
 #include "task.h"
 #include "utils.h"
 
-void load(ToDoList *todo_list, const char *filename) {
+void load(const char *filename) {
     // Open the file for reading
     FILE *file = fopen(filename, "r");
     if (file == NULL) {
@@ -31,7 +31,8 @@ void load(ToDoList *todo_list, const char *filename) {
     }
 
     size_t items_count = json_array_size(jarray);
-    free(todo_list->items);
+    free(to_do_list.items);
+    free(to_do_proj.items);
 
     // Iterate over the JSON array and fill the ToDoList
     for (size_t i = 0; i < items_count; i++) {
@@ -114,6 +115,9 @@ void load(ToDoList *todo_list, const char *filename) {
 	    new_task.value = 0;
         }
         append(to_do_list, new_task);
+	if(strcmp(new_task.project, "none") && !is_in_proj_list(new_task.project)){
+	    append(to_do_proj, new_task.project);
+	}
     }
 
     json_decref(jarray);

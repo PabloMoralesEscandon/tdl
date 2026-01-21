@@ -5,6 +5,8 @@
 
 ToDoList to_do_list;
 
+ToDoProjects to_do_proj;
+
 void print_task(Task *task){
     if (task == NULL) {
         printf("Task is NULL\n");
@@ -135,4 +137,11 @@ int when_due(time_t target){
     time_t time_1_year = mktime(&time_now);
     if((target < time_1_year) && (target > now)) return YEAR;
     return LATER;
+}
+
+int is_in_proj_list(char *name){
+    for(int i=0; i<to_do_proj.n_items; i++){
+	if(!strcmp(name, to_do_proj.items[i])) return 1;
+    }
+    return 0;
 }

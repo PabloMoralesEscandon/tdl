@@ -2,10 +2,9 @@
 
 #include "parser.h"
 #include "memory.h"
-#include "task.h"
 
 int main (int argc, char **argv) {
-    load(&to_do_list, FILE_NAME);
+    load(FILE_NAME);
     update_recurrent(FILE_NAME);
     char *command = argv[1];
     char *options[NUMBER_OPT] = {0};
