@@ -98,4 +98,14 @@ int when_due(time_t target);
 
 int is_in_proj_list(char *name);
 
+void print_proj(int id); 
+
+void print_task_table_header();
+
+void print_task_table_row(Task *t);
+
+void print_proj_table_header();
+
+void print_proj_table_row(char *proj, int id);
+
 #endif

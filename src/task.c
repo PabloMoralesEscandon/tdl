@@ -145,3 +145,74 @@ int is_in_proj_list(char *name){
     }
     return 0;
 }
+
+void print_proj(int id){
+    char *project = to_do_proj.items[id];
+    float tasks = 0;
+    float done = 0;
+    for(int i=0; i<to_do_list.n_items; i++){
+	if(!strcmp(project, to_do_list.items[i].project)){
+	    tasks++;
+	    if(to_do_list.items[i].status == DONE) done++;
+	}
+    }
+    printf("Project %s has %d tasks.\n", project, (int)tasks);
+    int width = 20;
+    float percent = done / tasks; 
+    int progress = (int)(percent * width);
+    printf("Project is %.2f%% done.\n", percent*100.0);
+    for(int i=0; i<width; i++){
+	if(i<progress){
+	   printf("#");
+	} else printf("-");
+    }
+    printf("\n\n");
+
+    
+}
+
+void print_task_table_header() {
+    printf("%-5s %-20s %-10s %-12s %-10s %-15s %-15s %-15s\n",
+           "ID", "Name", "Priority", "Due", "Recurrent", "Status", "Category", "Project");
+}
+
+// Move to task.c
+void print_task_table_row(Task *t) {
+    struct tm *tm_info = localtime(&(t->due));
+    char buffer[11];
+    if(!(t->due)){ 	
+	snprintf(buffer,sizeof buffer, "-");
+    }else {
+	strftime(buffer, sizeof(buffer), "%d-%m-%Y", tm_info);
+    }
+    printf("%-5d %-20s %-10s %-12s %-10s %-15s %-15s %-15s\n",
+           t->id,
+           t->name ? t->name : "(none)",
+           get_priority(t->priority),
+           buffer,
+           get_recurrence(t->recurrent),
+           get_status(t->status),
+           t->category ? t->category : "(none)",
+           t->project ? t->project : "(none)");
+}
+
+void print_proj_table_header() {
+    printf("%-5s %-20s %10s\n",
+           "ID", "Project", "Status");
+}
+
+// Move to task.c
+void print_proj_table_row(char *proj, int id) {
+    float tasks = 0;
+    float done = 0;
+    for(int i=0; i<to_do_list.n_items; i++){
+	if(!strcmp(to_do_list.items[i].project, proj)){
+	    tasks++;
+	    if(to_do_list.items[i].status == DONE) done++;
+	}
+    }
+    float percent = 100 * done / tasks;
+    printf("%-5d %-20s %9.2f%%\n",
+	id, proj, percent);
+}
+

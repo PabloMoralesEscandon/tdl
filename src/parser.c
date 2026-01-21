@@ -19,6 +19,7 @@ Command commands[] = {
     {"del",    cmd_del},
     {"list",    cmd_list},
     {"list_projects", cmd_list_projects},
+    {"show_project", cmd_proj_show},
     {NULL,     NULL}  // Sentinel to mark end
 };
 
@@ -370,31 +371,6 @@ int cmd_show(char *options[], int id){
     return 1;
 }
 
-void print_task_table_header() {
-    printf("%-5s %-20s %-10s %-12s %-10s %-15s %-15s %-15s\n",
-           "ID", "Name", "Priority", "Due", "Recurrent", "Status", "Category", "Project");
-}
-
-// Move to task.c
-void print_task_table_row(Task *t) {
-    struct tm *tm_info = localtime(&(t->due));
-    char buffer[11];
-    if(!(t->due)){ 	
-	snprintf(buffer,sizeof buffer, "-");
-    }else {
-	strftime(buffer, sizeof(buffer), "%d-%m-%Y", tm_info);
-    }
-    printf("%-5d %-20s %-10s %-12s %-10s %-15s %-15s %-15s\n",
-           t->id,
-           t->name ? t->name : "(none)",
-           get_priority(t->priority),
-           buffer,
-           get_recurrence(t->recurrent),
-           get_status(t->status),
-           t->category ? t->category : "(none)",
-           t->project ? t->project : "(none)");
-}
-
 int cmd_list(char *options[], int id) {
     sort_list_value(to_do_list.items, 0, to_do_list.n_items-1); 
     set_bg256(230);
@@ -403,7 +379,6 @@ int cmd_list(char *options[], int id) {
     print_task_table_header();
     term_bold_off();
     printf(RESET);
-    int n = 0;
     int alternate = 0;
     int done = 0;
     for (int i = 0; i < to_do_list.n_items; i++) {
@@ -425,7 +400,7 @@ int cmd_list(char *options[], int id) {
 		if(when_due(to_do_list.items[i].due) < YEAR) continue;
 	    }
 	}
-	if((options[STATUS] && (to_do_list.items[i].status!=get_status_int(options[STATUS]))) || (!options[STATUS] && (to_do_list.items[i].status==DONE) && !options[PROJECT])) continue;
+	if((options[STATUS] && strcmp(options[STATUS], "all")) && (options[STATUS] && (to_do_list.items[i].status!=get_status_int(options[STATUS]))) || (!options[STATUS] && (to_do_list.items[i].status==DONE))) continue;
         if(options[CATEGORY] && (strcmp(to_do_list.items[i].category, options[CATEGORY]))) continue;
         if(options[PROJECT] && (strcmp(to_do_list.items[i].project,options[PROJECT]))) continue;
         if(options[NAME] && (strcmp(to_do_list.items[i].name, options[NAME]))) continue;
@@ -438,45 +413,8 @@ int cmd_list(char *options[], int id) {
 	set_bg256(bg);
         print_task_table_row(&to_do_list.items[i]);
 	printf(RESET);
-	if(options[PROJECT]){
-	    n++;
-	    if(to_do_list.items[i].status == DONE) done++;
-	}
     }
-    if(options[PROJECT]){
-	printf("Project %s has %d tasks.\n", options[PROJECT], n);
-	int width = 20;
-	double percent = (double)done/n; 
-	int progress = (int)(percent * (double)width);
-	printf("Project is %.2f%% done.\n", percent*100.0);
-	for(int i=0; i<width; i++){
-	    if(i<progress){
-		printf("#");
-	    } else printf("-");
-	}
-	printf("\n");
-    }	
     return 0;
-}
-
-void print_proj_table_header() {
-    printf("%-5s %-20s %10s\n",
-           "ID", "Project", "Status");
-}
-
-// Move to task.c
-void print_proj_table_row(char *proj, int id) {
-    float tasks = 0;
-    float done = 0;
-    for(int i=0; i<to_do_list.n_items; i++){
-	if(!strcmp(to_do_list.items[i].project, proj)){
-	    tasks++;
-	    if(to_do_list.items[i].status == DONE) done++;
-	}
-    }
-    float percent = 100 * done / tasks;
-    printf("%-5d %-20s %9.2f%%\n",
-	id, proj, percent);
 }
 
 int cmd_list_projects(char *options[], int id){
@@ -498,6 +436,34 @@ int cmd_list_projects(char *options[], int id){
 	printf(RESET);
     }
     return 0;
+}
+
+int cmd_proj_show(char *options[], int id){
+    if(id!=-1){ 
+	if(id<to_do_proj.n_items){
+	    options[PROJECT] = strdup(to_do_proj.items[id]);
+	    options[STATUS] = strdup("all");
+	    print_proj(id);
+	    cmd_list(options, -1);
+	    return 0;
+	} else{
+	    printf("No project with id %d.", id);
+	    return 1;
+	}
+    } else{
+	for(int i=0; i<to_do_proj.n_items; i++){
+	    if(!strcmp(options[NAME], to_do_proj.items[i])){
+		options[PROJECT] = strdup(to_do_proj.items[i]);
+		options[STATUS] = strdup("all");
+		options[NAME]=NULL;
+		print_proj(i);
+		cmd_list(options, -1);
+		return 0;
+	    }
+	}
+    }
+    printf("No project with name %s", options[NAME]);
+    return 1;
 }
 static void set_bg256(int n) { printf(ESC "48;5;%dm", n); }
 static void set_fg256(int n) { printf(ESC "38;5;%dm", n); }
