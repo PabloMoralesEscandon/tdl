@@ -46,6 +46,8 @@ int cmd_show(char *options[], int id);
 
 int cmd_list(char *options[], int id);
 
+int cmd_list_projects(char *options[], int id);
+
 
 static void set_bg256(int n);
 static void set_fg256(int n);

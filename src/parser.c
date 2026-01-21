@@ -18,6 +18,7 @@ Command commands[] = {
     {"done",    cmd_done},
     {"del",    cmd_del},
     {"list",    cmd_list},
+    {"list_projects", cmd_list_projects},
     {NULL,     NULL}  // Sentinel to mark end
 };
 
@@ -449,6 +450,10 @@ int cmd_list(char *options[], int id) {
 	}
 	printf("\n");
     }	
+    return 0;
+}
+
+int cmd_list_projects(char *options[], int id){
     return 0;
 }
 static void set_bg256(int n) { printf(ESC "48;5;%dm", n); }
