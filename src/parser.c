@@ -20,7 +20,7 @@ Command commands[] = {
     {"list",    	cmd_list,		"List all tasks"},
     {"list_projects", 	cmd_list_projects,	"List all projects"},
     {"show_project", 	cmd_proj_show,		"Show information of a project"},
-    {NULL,     NULL}  // Sentinel to mark end
+    {NULL,     		NULL, 			NULL}  // Sentinel to mark end
 };
 
 int dispatch_command(char *cmd, char* options[], int id) {
@@ -53,7 +53,7 @@ char *parse_words(int argc, char **argv){
 int parse_id_name(char *words){
     int i=0;
     while(isdigit(words[i++]));
-    if((i-1)==strlen(words)){
+    if((i-1)==(int)strlen(words)){
         return atoi(words);
     } else{
         return -1;
@@ -134,10 +134,11 @@ int parse_options(int argc, char **argv, char **options){
 }
 
 int cmd_add(char *options[], int id){
+    (void)id;
     Task new_task = {0};
     int task_id;
     new_task.id = -1;
-    for(task_id=0; task_id<to_do_list.n_items; task_id++){
+    for(task_id=0; task_id<(int)to_do_list.n_items; task_id++){
         if(task_id!=to_do_list.items[task_id].id) break;
     }
     new_task.id = task_id;
@@ -231,7 +232,7 @@ int cmd_del(char *options[], int id){
         printf("Deleted task: %d\n", id);
         return 0;
     } else if(options[NAME]!=NULL){
-        for(int i=0; i<to_do_list.n_items; i++){
+        for(size_t i=0; i<to_do_list.n_items; i++){
             if(!strcmp(options[NAME], to_do_list.items[i].name)){
                 id = to_do_list.items[i].id;
                 delete_task(FILE_NAME, id);
@@ -252,7 +253,7 @@ int cmd_mod(char *options[], int id){
     int index = -1;
     if(id==-1){
         if(options[NAME]!=NULL){
-            for(int i=0; i<to_do_list.n_items; i++){
+            for(size_t i=0; i<to_do_list.n_items; i++){
                 if(!strcmp(options[NAME], to_do_list.items[i].name)){
                     index = i;
                     break;
@@ -267,7 +268,7 @@ int cmd_mod(char *options[], int id){
             return 1;
         }
             
-    } else for(int i=0; i<to_do_list.n_items; i++){
+    } else for(size_t i=0; i<to_do_list.n_items; i++){
         if(id == to_do_list.items[i].id){
             index = i;
             break;
@@ -364,14 +365,14 @@ int cmd_mod(char *options[], int id){
 
 int cmd_start(char *options[], int id){
     if(id!=-1){
-        for(int i=0; (i<to_do_list.n_items) && (i<=id); i++){
+        for(size_t i=0; i<to_do_list.n_items; i++){
             if(id==to_do_list.items[i].id){
                 to_do_list.items[i].status = IN_PROGRESS;
                 break;
             }
         }
     } else if(options[NAME]!=NULL){
-        for(int i=0; i<to_do_list.n_items; i++){
+        for(size_t i=0; i<to_do_list.n_items; i++){
             if(!strcmp(options[NAME], to_do_list.items[i].name)){
                 to_do_list.items[i].status = IN_PROGRESS;
                 id = to_do_list.items[i].id;
@@ -387,7 +388,7 @@ int cmd_start(char *options[], int id){
 int cmd_done(char *options[], int id){
     int index = -1;
     if(id!=-1){
-        for(int i=0; i<to_do_list.n_items; i++){
+        for(size_t i=0; i<to_do_list.n_items; i++){
             if(id==to_do_list.items[i].id){
                 to_do_list.items[i].status = DONE;
                 index =i;
@@ -395,7 +396,7 @@ int cmd_done(char *options[], int id){
             }
         }
     } else if(options[NAME]!=NULL){
-        for(int i=0; i<to_do_list.n_items; i++){
+        for(size_t i=0; i<to_do_list.n_items; i++){
             if(!strcmp(options[NAME], to_do_list.items[i].name)){
                 to_do_list.items[i].status = DONE;
                 id = to_do_list.items[i].id;
@@ -418,7 +419,7 @@ int cmd_done(char *options[], int id){
 
 int cmd_show(char *options[], int id){
     if(id!=-1){
-        for(int i=0; i<to_do_list.n_items; i++){
+        for(size_t i=0; i<to_do_list.n_items; i++){
             if(id == to_do_list.items[i].id){
                 print_task(&to_do_list.items[i]);
                 return(0);
@@ -428,7 +429,7 @@ int cmd_show(char *options[], int id){
 	return 1;
 
     }
-    for(int i=0; i<to_do_list.n_items; i++){
+    for(size_t i=0; i<to_do_list.n_items; i++){
         if(!strcmp(options[NAME], to_do_list.items[i].name)){
             print_task(&to_do_list.items[i]);
             return(0);
@@ -447,8 +448,7 @@ int cmd_list(char *options[], int id) {
     term_bold_off();
     printf(RESET);
     int alternate = 0;
-    int done = 0;
-    for (int i = 0; i < to_do_list.n_items; i++) {
+    for (size_t i = 0; i < to_do_list.n_items; i++) {
 
         if((id!=-1) && (to_do_list.items[i].id!=id)) continue;
         if(options[PRIORITY] && (to_do_list.items[i].priority!=get_priority_int(options[PRIORITY]))) continue;
@@ -467,7 +467,11 @@ int cmd_list(char *options[], int id) {
 		if(when_due(to_do_list.items[i].due) < YEAR) continue;
 	    }
 	}
-	if((options[STATUS] && strcmp(options[STATUS], "all")) && (options[STATUS] && (to_do_list.items[i].status!=get_status_int(options[STATUS]))) || (!options[STATUS] && (to_do_list.items[i].status==DONE))) continue;
+	if(
+		((options[STATUS] && strcmp(options[STATUS], "all"))
+		&& (options[STATUS] && (to_do_list.items[i].status!=get_status_int(options[STATUS]))))
+		|| (!options[STATUS] && (to_do_list.items[i].status==DONE))
+	    ) continue;
         if(options[CATEGORY] && (strcmp(to_do_list.items[i].category, options[CATEGORY]))) continue;
         if(options[PROJECT] && (strcmp(to_do_list.items[i].project,options[PROJECT]))) continue;
         if(options[NAME] && (strcmp(to_do_list.items[i].name, options[NAME]))) continue;
@@ -485,6 +489,8 @@ int cmd_list(char *options[], int id) {
 }
 
 int cmd_list_projects(char *options[], int id){
+    (void)options;
+    (void)id;
     set_bg256(230);
     set_fg256(232);
     term_bold_on();
@@ -492,7 +498,7 @@ int cmd_list_projects(char *options[], int id){
     term_bold_off();
     printf(RESET);
     int alternate = 0;
-    for(int i=0; i<to_do_proj.n_items; i++){
+    for(size_t i=0; i<to_do_proj.n_items; i++){
 	int bg;
 	if(alternate){
 	    bg = 235;
@@ -507,7 +513,7 @@ int cmd_list_projects(char *options[], int id){
 
 int cmd_proj_show(char *options[], int id){
     if(id!=-1){ 
-	if(id<to_do_proj.n_items){
+	if(id<(int)to_do_proj.n_items){
 	    options[PROJECT] = strdup(to_do_proj.items[id]);
 	    options[STATUS] = strdup("all");
 	    print_proj(id);
@@ -518,10 +524,10 @@ int cmd_proj_show(char *options[], int id){
 	    return 1;
 	}
     } else{
-	for(int i=0; i<to_do_proj.n_items; i++){
+	for(size_t i=0; i<to_do_proj.n_items; i++){
 	    if(!strcmp(options[NAME], to_do_proj.items[i])){
 		options[PROJECT] = strdup(to_do_proj.items[i]);
-		options[STATUS] = strdup("all");
+		if(!options[STATUS]) options[STATUS] = strdup("all");
 		options[NAME]=NULL;
 		print_proj(i);
 		cmd_list(options, -1);

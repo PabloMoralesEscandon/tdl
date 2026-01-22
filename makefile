@@ -5,7 +5,8 @@ BUILDDIR = build
 
 # Compiler and flags
 CC = clang
-CFLAGS = -I$(INCDIR) -g -O0
+WARNFLAGS = -Wall -Wextra
+CFLAGS = -I$(INCDIR) $(WARNFLAGS) -g -O0
 LDFLAGS = -ljansson
 
 # Source and object files
@@ -16,14 +17,18 @@ OBJ = $(patsubst $(SRCDIR)/%.c,$(BUILDDIR)/%.o,$(SRC))
 MYPROG = $(BUILDDIR)/myprog
 TDL = tdl
 
-# Default target: build everything
+# Default target: debug-style build
 all: $(BUILDDIR) $(MYPROG) $(TDL)
 
-# Build myprog (debug in build/)
+# Release target: optimized, no debug, disables assert()
+release: CFLAGS := -I$(INCDIR) $(WARNFLAGS) -O3 -DNDEBUG
+release: clean $(BUILDDIR) $(MYPROG) $(TDL)
+
+# Build myprog
 $(MYPROG): $(OBJ)
 	$(CC) $(CFLAGS) $^ $(LDFLAGS) -o $@
 
-# Build tdl (symlink/copy to root)
+# Build tdl (copy to root)
 $(TDL): $(MYPROG)
 	cp $< $@
 
@@ -41,4 +46,7 @@ clean:
 
 # Debug target
 debug: all
-	@echo "Debug build ready: $(MYPROG), root symlink: $(TDL)"
+	@echo "Debug build ready: $(MYPROG), root copy: $(TDL)"
+
+.PHONY: all release clean debug
+

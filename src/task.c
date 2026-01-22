@@ -127,8 +127,13 @@ char *get_status(int status){
 
 int get_status_int(char *status){
     if(!strcmp(status, "To do")) return TODO;
+    if(!strcmp(status, "to do")) return TODO;
     else if(!strcmp(status, "In progress")) return IN_PROGRESS;
+    else if(!strcmp(status, "in progress")) return IN_PROGRESS;
+    else if(!strcmp(status, "todo")) return TODO;
+    else if(!strcmp(status, "ongoing")) return IN_PROGRESS;
     else if(!strcmp(status, "Done")) return DONE;
+    else if(!strcmp(status, "done")) return DONE;
     else{
 	return -1;
     }
