@@ -40,10 +40,6 @@ char *parse_words(int argc, char **argv){
     for(int n=2; n<i; n++){
         size+=strlen(argv[n])+1;
     }
-    if(size>NAME_CHARS){
-        printf("Name is too long\n");
-        return NULL;
-    }
     if(!size) return NULL;
     char *words=malloc(size);
     if(i>2) strcpy(words, argv[2]);
