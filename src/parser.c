@@ -47,7 +47,6 @@ char *parse_words(int argc, char **argv){
         strcat(words, " ");
         strcat(words, argv[n]);
     }
-    printf("%d  %s\n", i, words);
     return words;
 }
 
@@ -55,10 +54,8 @@ int parse_id_name(char *words){
     int i=0;
     while(isdigit(words[i++]));
     if((i-1)==strlen(words)){
-        printf("It is an id\n");
         return atoi(words);
     } else{
-        printf("It is a name\n");
         return -1;
     }
 }
