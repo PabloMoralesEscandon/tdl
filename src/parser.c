@@ -538,7 +538,7 @@ int cmd_proj_show(char *options[], int id){
     printf("No project with name %s", options[NAME]);
     return 1;
 }
-static void set_bg256(int n) { printf(ESC "48;5;%dm", n); }
-static void set_fg256(int n) { printf(ESC "38;5;%dm", n); }
+static inline void set_bg256(int n) { printf(ESC "48;5;%dm", n); }
+static inline void set_fg256(int n) { printf(ESC "38;5;%dm", n); }
 static inline void term_bold_on(void)  { fputs("\x1b[1m", stdout); }   // bold on [web:14]
 static inline void term_bold_off(void) { fputs("\x1b[22m", stdout); }

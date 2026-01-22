@@ -268,7 +268,7 @@ int delete_task(const char *filename, int target_id) {
 }
 
 void update_recurrent(const char* filename){
-    for(int i=0; i<to_do_list.n_items; i++){
+    for(size_t i=0; i<to_do_list.n_items; i++){
 	if(to_do_list.items[i].recurrent && to_do_list.items[i].status == DONE && (second_until(to_do_list.items[i].due) < 0)){
 	    struct tm time = *localtime(&to_do_list.items[i].due);
 	    switch(to_do_list.items[i].recurrent){

@@ -178,7 +178,7 @@ int when_due(time_t target){
 }
 
 int is_in_proj_list(char *name){
-    for(int i=0; i<to_do_proj.n_items; i++){
+    for(size_t i=0; i<to_do_proj.n_items; i++){
 	if(!strcmp(name, to_do_proj.items[i])) return 1;
     }
     return 0;
@@ -188,7 +188,7 @@ void print_proj(int id){
     char *project = to_do_proj.items[id];
     float tasks = 0;
     float done = 0;
-    for(int i=0; i<to_do_list.n_items; i++){
+    for(size_t i=0; i<to_do_list.n_items; i++){
 	if(!strcmp(project, to_do_list.items[i].project)){
 	    tasks++;
 	    if(to_do_list.items[i].status == DONE) done++;
@@ -249,7 +249,7 @@ void print_proj_table_header() {
 void print_proj_table_row(char *proj, int id) {
     float tasks = 0;
     float done = 0;
-    for(int i=0; i<to_do_list.n_items; i++){
+    for(size_t i=0; i<to_do_list.n_items; i++){
 	if(!strcmp(to_do_list.items[i].project, proj)){
 	    tasks++;
 	    if(to_do_list.items[i].status == DONE) done++;
