@@ -224,7 +224,7 @@ void print_task_table_row(Task *t) {
     }
     if(!strcmp(t->category, "none")){
 	free(t->category);
-	(t->project) = strdup("-");
+	(t->category) = strdup("-");
     }
     if(!strcmp(t->project, "none")){
 	free(t->project);
