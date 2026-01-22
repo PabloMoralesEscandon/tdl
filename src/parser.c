@@ -191,6 +191,10 @@ int cmd_add(char *options[], int id){
 	new_task.project = strdup(options[PROJECT]);
     } else new_task.project = "none";
     if(options[CATEGORY]){
+	if ((strlen(options[CATEGORY])+1) > NAME_CHARS) {
+            printf("Category is too long. Max %d characters.\n", NAME_CHARS);
+            return 1;
+        }
         new_task.category = options[CATEGORY];
     } else new_task.category = "none";
     if(options[DESC]){
@@ -259,7 +263,12 @@ int cmd_mod(char *options[], int id){
         return 1;
     }
     if(options[NAME]){
-        to_do_list.items[index].name = options[NAME];
+        if ((strlen(options[NAME])+1) > NAME_CHARS) {
+            printf("Name is too long. Max %d characters.\n", NAME_CHARS);
+            return 1;
+        }
+	free(to_do_list.items[index].name);
+        to_do_list.items[index].name = strdup(options[NAME]);
     }
     if(options[PRIORITY]){
         if(!strcmp(options[PRIORITY], "low")) to_do_list.items[index].priority = LOW;
@@ -282,12 +291,44 @@ int cmd_mod(char *options[], int id){
         }
     }
     if(options[DUE]){
-        // Add logic
+        struct tm date = {0};
+        if( (strlen(options[DUE]) == 10)
+            && (isdigit(options[DUE][0]) && isdigit(options[DUE][1]))
+            && (isdigit(options[DUE][3]) && isdigit(options[DUE][4]))
+            && (isdigit(options[DUE][6]) && isdigit(options[DUE][7]))
+            && (isdigit(options[DUE][8]) && isdigit(options[DUE][9]))
+            && ((options[DUE][2] == options[DUE][5]) && (options[DUE][2] == '-'))
+        ){
+            date.tm_mday = (options[DUE][0] - '0') * 10 + (options[DUE][1] - '0');
+            date.tm_mon = (options[DUE][3] - '0') * 10 + (options[DUE][4] - '0')-1;
+            date.tm_year = (options[DUE][8] - '0') * 10 + (options[DUE][9] - '0');
+            date.tm_year += (options[DUE][6] - '0') * 1000 + (options[DUE][7] - '0') * 100;
+	    date.tm_year-=1900;
+	} else{
+            printf("Failed to parse date or invalid format. Make sure date is in format DD-MM-YYYY.\n");
+            return 0;
+        }
+        if(is_valid_date(date)){
+            to_do_list.items[index].due = mktime(&date);
+        } else{
+            printf("Failed to parse date or invalid format. Make sure date is in format DD-MM-YYYY.\n");
+            return 0;
+	}
+	
     }
     if(options[PROJECT]){
-        // Add logic
+	if ((strlen(options[PROJECT])+1) > NAME_CHARS) {
+            printf("Project is too long. Max %d characters.\n", NAME_CHARS);
+            return 1;
+        }
+	free(to_do_list.items[index].project);
+	to_do_list.items[index].project = strdup(options[PROJECT]);
     }
     if(options[CATEGORY]){
+	if ((strlen(options[CATEGORY])+1) > NAME_CHARS) {
+            printf("Category is too long. Max %d characters.\n", NAME_CHARS);
+            return 1;
+        }
         free(to_do_list.items[index].category);
         to_do_list.items[index].category = strdup(options[CATEGORY]);
     }
