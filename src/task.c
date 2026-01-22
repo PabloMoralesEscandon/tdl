@@ -172,7 +172,7 @@ void print_proj(int id){
 }
 
 void print_task_table_header() {
-    printf("%-5s %-20s %-10s %-12s %-10s %-15s %-15s %-15s\n",
+    printf("%-5s %-25s %-10s %-12s %-10s %-15s %-25s %-25s\n",
            "ID", "Name", "Priority", "Due", "Recurrent", "Status", "Category", "Project");
 }
 
@@ -185,19 +185,27 @@ void print_task_table_row(Task *t) {
     }else {
 	strftime(buffer, sizeof(buffer), "%d-%m-%Y", tm_info);
     }
-    printf("%-5d %-20s %-10s %-12s %-10s %-15s %-15s %-15s\n",
+    if(!strcmp(t->category, "none")){
+	free(t->category);
+	(t->project) = strdup("-");
+    }
+    if(!strcmp(t->project, "none")){
+	free(t->project);
+	(t->project) = strdup("-");
+    }
+    printf("%-5d %-25s %-10s %-12s %-10s %-15s %-25s %-25s\n",
            t->id,
            t->name ? t->name : "(none)",
            get_priority(t->priority),
            buffer,
            get_recurrence(t->recurrent),
            get_status(t->status),
-           t->category ? t->category : "(none)",
-           t->project ? t->project : "(none)");
+           t->category ? t->category : "-",
+           t->project ? t->project : "-");
 }
 
 void print_proj_table_header() {
-    printf("%-5s %-20s %10s\n",
+    printf("%-5s %-25s %10s\n",
            "ID", "Project", "Status");
 }
 
@@ -212,7 +220,7 @@ void print_proj_table_row(char *proj, int id) {
 	}
     }
     float percent = 100 * done / tasks;
-    printf("%-5d %-20s %9.2f%%\n",
+    printf("%-5d %-25s %9.2f%%\n",
 	id, proj, percent);
 }
 
