@@ -7,23 +7,56 @@ ToDoList to_do_list;
 
 ToDoProjects to_do_proj;
 
-void print_task(Task *task){
-    if (task == NULL) {
+
+static const char *dash_if_missing(const char *s) {
+    // Treat NULL, empty string, or literal "none" as missing. [web:7][web:10]
+    if (s == NULL || s[0] == '\0' || strcmp(s, "none") == 0) return "-";
+    return s;
+}
+
+static void format_due_date(char out[11], time_t due) {
+    if (due == (time_t)0) {                      // "unset" convention
+        snprintf(out, 11, "-");
+        return;
+    }
+    struct tm *tm_info = localtime(&due);        // convert to local time [web:15]
+    if (!tm_info) {                              // localtime can fail [web:6]
+        snprintf(out, 11, "-");
+        return;
+    }
+    strftime(out, 11, "%d-%m-%Y", tm_info);
+}
+
+static void print_label_value(const char *label, const char *value) {
+    printf(ANSI_BOLD_BLUE "%s" ANSI_RESET " %s\n", label, value); // style via ANSI [web:5][web:2]
+}
+
+void print_task(Task *task) {
+    if (!task) {
         printf("Task is NULL\n");
         return;
     }
-    printf("Task ID: %d\n", task->id);
-    printf("Name: %s\n", task->name);
-    if(strcmp("none", task->description))
-        printf("Description: %s\n", task->description);
-    printf("Priority: %s.\n", get_priority(task->priority));    
-    struct tm *tm_info = localtime(&(task->due));
-    char buffer[11];
-    strftime(buffer, sizeof(buffer), "%d-%m-%Y", tm_info);
-    printf("Due: %s\n", buffer);
-    if(task->recurrent!=NO) printf("%s.\n", get_recurrence(task->recurrent));
-    printf("Category: %s\n", task->category ? task->category : "(none)");
-    printf("Project: %s\n", task->project ? task->project : "(none)");
+
+    char due_buf[11];
+    format_due_date(due_buf, task->due);
+
+    // Labels bold+blue, values normal.
+    printf(ANSI_BOLD_BLUE "Task ID:" ANSI_RESET " %d\n", task->id);                          // ANSI [web:5][web:2]
+    print_label_value("Name:", task->name ? task->name : "-");
+
+    if (task->description && task->description[0] != '\0' && strcmp(task->description, "none") != 0) {
+        print_label_value("Description:", task->description);
+    }
+
+    print_label_value("Priority:", get_priority(task->priority));
+    print_label_value("Due:", due_buf);
+
+    if (task->recurrent != NO) {
+        print_label_value("Recurrence:", get_recurrence(task->recurrent));
+    }
+
+    print_label_value("Category:", dash_if_missing(task->category));
+    print_label_value("Project:",  dash_if_missing(task->project));
 }
 
 char *get_priority(int priority){
@@ -176,7 +209,6 @@ void print_task_table_header() {
            "ID", "Name", "Priority", "Due", "Recurrent", "Status", "Category", "Project");
 }
 
-// Move to task.c
 void print_task_table_row(Task *t) {
     struct tm *tm_info = localtime(&(t->due));
     char buffer[11];
@@ -209,7 +241,6 @@ void print_proj_table_header() {
            "ID", "Project", "Status");
 }
 
-// Move to task.c
 void print_proj_table_row(char *proj, int id) {
     float tasks = 0;
     float done = 0;

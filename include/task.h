@@ -7,6 +7,11 @@
 #define NAME_CHARS 21
 #define DESC_CHARS 201
 
+#define ANSI_RESET     "\x1b[0m"
+#define ANSI_BOLD      "\x1b[1m"
+#define ANSI_BLUE      "\x1b[34m"
+#define ANSI_BOLD_BLUE "\x1b[1;34m"
+
 enum Status {
     TODO,
     IN_PROGRESS,
