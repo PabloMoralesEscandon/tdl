@@ -7,9 +7,34 @@
 #include "task.h"
 #include "utils.h"
 
+FILE *open_json_or_create_empty(const char *path){
+    json_error_t error;
+    json_t *root = json_load_file(path, 0, &error);  // returns NULL on error [web:90]
+
+    if (!root) {
+        // Create empty JSON array (use json_object() if you want {}). [web:48]
+        json_t *empty = json_array();                // new reference, initially empty [web:48]
+        if (!empty) return NULL;
+
+        // Write JSON to file; if path exists, it is overwritten. [web:51]
+        if (json_dump_file(empty, path, JSON_INDENT(2)) != 0) {
+            json_decref(empty);
+            return NULL;
+        }
+        json_decref(empty);
+
+        // Now it exists and is valid JSON; open stream for the caller.
+        return fopen(path, "r");
+    }
+
+    // File exists and parsed OK; free parsed JSON and open stream for reading.
+    json_decref(root);
+    return fopen(path, "r");
+}
+
 void load(const char *filename) {
     // Open the file for reading
-    FILE *file = fopen(filename, "r");
+    FILE *file = open_json_or_create_empty(filename);
     if (file == NULL) {
         perror("Error opening file");
         return;
