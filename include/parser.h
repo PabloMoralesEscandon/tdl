@@ -22,6 +22,7 @@ typedef int (*CommandHandler)(char *options[], int id);
 typedef struct {
     const char *name;
     CommandHandler handler;
+    const char *desc;
 } Command;
 
 int dispatch_command(char *cmd, char* options[], int id);

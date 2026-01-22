@@ -11,15 +11,15 @@
 #include "utils.h"
 
 Command commands[] = {
-    {"add",    cmd_add},
-    {"show",    cmd_show},
-    {"mod",    cmd_mod},
-    {"start",    cmd_start},
-    {"done",    cmd_done},
-    {"del",    cmd_del},
-    {"list",    cmd_list},
-    {"list_projects", cmd_list_projects},
-    {"show_project", cmd_proj_show},
+    {"add",    		cmd_add,		"Add a new task"},
+    {"show",    	cmd_show,		"Show information of a task"},
+    {"mod",    		cmd_mod,		"Modify an existing task"},
+    {"start",   	cmd_start,		"Mark a task as started"},
+    {"done",    	cmd_done,		"Mark a task as done"},
+    {"del",    		cmd_del,		"Delete a task"},
+    {"list",    	cmd_list,		"List all tasks"},
+    {"list_projects", 	cmd_list_projects,	"List all projects"},
+    {"show_project", 	cmd_proj_show,		"Show information of a project"},
     {NULL,     NULL}  // Sentinel to mark end
 };
 
@@ -63,6 +63,25 @@ int parse_id_name(char *words){
     }
 }
 
+void print_help(void){
+    puts("TDL (ToDoList): A command line to do list.");
+    puts("Usage: tdl [command] [id or name] <options>");
+    puts("");
+    puts("Commands:");
+    for(int i=0; commands[i].name != NULL; i++) printf("  %s: %s\n", commands[i].name, commands[i].desc);
+    puts("");
+    puts("Options:");
+    puts("  -p, --priority <val>       Task priority");
+    puts("  -r, --recurrent <val>      Recurrent rule / interval");
+    puts("  -d, --due <val>            Due date/time");
+    puts("  -s, --status <val>         Task status");
+    puts("  -c, --category <val>       Category");
+    puts("  -P, --project <val>        Project");
+    puts("  -n, --name <val>           Task name/title");
+    puts("  -D, --description <val>    Task description");
+    puts("  -h, --help                 Show this help and exit");
+}
+
 int parse_options(int argc, char **argv, char **options){
     static struct option long_options[] = {
         {"priority",    required_argument, 0, 'p'},
@@ -73,13 +92,14 @@ int parse_options(int argc, char **argv, char **options){
         {"project",     required_argument, 0, 'P'},
         {"name",        required_argument, 0, 'n'},
         {"description", required_argument, 0, 'D'},
+	{"help", 	no_argument, 	   0, 'h'},
         {0, 0, 0, 0}  
     };
 
     
     int opt;
 
-    while ((opt = getopt_long(argc, argv, "p:r:d:s:c:P:n:D:", long_options, NULL)) != -1) {
+    while ((opt = getopt_long(argc, argv, "p:r:d:s:c:P:n:D:h", long_options, NULL)) != -1) {
         switch (opt) {
             case 'p':
                 options[PRIORITY] = strdup(optarg);
@@ -105,6 +125,9 @@ int parse_options(int argc, char **argv, char **options){
             case 'D':
                 options[DESC] = strdup(optarg);
                 break;
+	    case 'h':
+		print_help();
+		exit(0);
             default:
                 printf("Unknown option:\n");
         }
