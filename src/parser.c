@@ -365,11 +365,13 @@ int cmd_start(char *options[], int id){
 }
 
 int cmd_done(char *options[], int id){
+    int index = -1;
     if(id!=-1){
         for(int i=0; i<to_do_list.n_items; i++){
             if(id==to_do_list.items[i].id){
                 to_do_list.items[i].status = DONE;
-                break;
+                index =i;
+		break;
             }
         }
     } else if(options[NAME]!=NULL){
@@ -377,12 +379,20 @@ int cmd_done(char *options[], int id){
             if(!strcmp(options[NAME], to_do_list.items[i].name)){
                 to_do_list.items[i].status = DONE;
                 id = to_do_list.items[i].id;
-                break;
+                index = i;
+		break;
             }
         }
+    } else{
+	printf("Provide anme or id ot he completed task.\n");
+	return 1;
+    }
+    if(index==-1){
+	printf("Could not find the completed task");
+	return 1;
     }
     delete_task(FILE_NAME, id);
-    save(&to_do_list.items[id], FILE_NAME);
+    save(&to_do_list.items[index], FILE_NAME);
     return 0;
 }
 
