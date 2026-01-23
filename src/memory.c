@@ -3,11 +3,28 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <sys/stat.h>
 
 #include "task.h"
 #include "utils.h"
 
-FILE *open_json_or_create_empty(const char *path){
+const char *dir = "/home/pablome/.local/tdl/";
+
+char *open_json_or_create_empty(const char *file){
+    struct stat statbuf;
+    if(stat(dir, &statbuf)){
+	if(mkdir(dir, 0755)){
+	    printf("Failed to create directory for tasks.json\n");
+	    return NULL;
+	}
+    }
+    size_t size = strlen(dir) + strlen(file) + 1;
+    char *path = malloc(size);
+    if(!path){
+	puts("Could not allocate path string");
+	return NULL;
+    }
+    snprintf(path, size, "%s%s", dir, file);
     json_error_t error;
     json_t *root = json_load_file(path, 0, &error);  // returns NULL on error [web:90]
 
@@ -24,17 +41,17 @@ FILE *open_json_or_create_empty(const char *path){
         json_decref(empty);
 
         // Now it exists and is valid JSON; open stream for the caller.
-        return fopen(path, "r");
+        return path;
     }
 
     // File exists and parsed OK; free parsed JSON and open stream for reading.
     json_decref(root);
-    return fopen(path, "r");
+    return path;
 }
 
 void load(const char *filename) {
     // Open the file for reading
-    FILE *file = open_json_or_create_empty(filename);
+    FILE *file = fopen(open_json_or_create_empty(filename), "r");
     if (file == NULL) {
         perror("Error opening file");
         return;
@@ -155,10 +172,11 @@ void save(Task *task, const char *filename) {
     json_error_t error;
 
     // Try to open existing file for reading
-    FILE *file = fopen(filename, "r");
+    FILE *file = fopen(open_json_or_create_empty(filename), "r");
     if (file != NULL) {
         jarray = json_loadf(file, 0, &error);
         fclose(file);
+	file = NULL;
         if (jarray == NULL) {
             fprintf(stderr, "Error parsing JSON: %s\n", error.text);
             // Create new array if parsing failed
@@ -198,9 +216,7 @@ void save(Task *task, const char *filename) {
 
     // Append the new task to the JSON array
     json_array_append_new(jarray, json_task);
-
-    // Open the file for writing (overwrite)
-    file = fopen(filename, "w");
+    file = fopen(open_json_or_create_empty(filename), "w");
     if (file == NULL) {
         perror("Error opening file for writing");
         json_decref(jarray);
@@ -219,9 +235,9 @@ void save(Task *task, const char *filename) {
 int delete_task(const char *filename, int target_id) {
     json_error_t error;
     json_t *root;
-
+    FILE *file = fopen(open_json_or_create_empty(filename), "w");
     // 1. Load and parse JSON file
-    root = json_load_file(filename, 0, &error);
+    root = json_loadf(file, 0, &error);
     if (!root) {
         fprintf(stderr, "Error loading JSON: %s (line %d)\n", error.text, error.line);
         return 1;
