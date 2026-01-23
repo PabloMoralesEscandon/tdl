@@ -235,9 +235,10 @@ void save(Task *task, const char *filename) {
 int delete_task(const char *filename, int target_id) {
     json_error_t error;
     json_t *root;
-    FILE *file = fopen(open_json_or_create_empty(filename), "w");
+    FILE *file = fopen(open_json_or_create_empty(filename), "r");
     // 1. Load and parse JSON file
     root = json_loadf(file, 0, &error);
+    fclose(file);
     if (!root) {
         fprintf(stderr, "Error loading JSON: %s (line %d)\n", error.text, error.line);
         return 1;
@@ -261,7 +262,6 @@ int delete_task(const char *filename, int target_id) {
             if (json_integer_value(id_obj) == target_id) {
                 json_array_remove(root, index);
                 found = 1;
-                printf("Removed item with ID %d\n", target_id);
                 break;
             }
         }
@@ -271,14 +271,23 @@ int delete_task(const char *filename, int target_id) {
         printf("No item with ID %d found\n", target_id);
     }
 
-    // 4. Save modified JSON back to file
-    if (json_dump_file(root, filename, JSON_INDENT(4)) != 0) {
-        fprintf(stderr, "Error saving file\n");
+    file = fopen(open_json_or_create_empty(filename), "w");
+    if (file == NULL) {
+        perror("Error opening file for writing");
         json_decref(root);
         return 1;
     }
 
+    // 4. Save modified JSON back to file
+    if (json_dumpf(root, file, JSON_INDENT(4)) != 0) {
+        fprintf(stderr, "Error saving file\n");
+        json_decref(root);
+	fclose(file);
+        return 1;
+    }
+
     // 5. Cleanup
+    fclose(file);
     json_decref(root);
     return 0;
 }

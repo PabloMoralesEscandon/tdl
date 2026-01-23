@@ -236,7 +236,7 @@ int cmd_del(char *options[], int id){
             if(!strcmp(options[NAME], to_do_list.items[i].name)){
                 id = to_do_list.items[i].id;
                 delete_task(FILE_NAME, id);
-                printf("Deleted task: %d\n", id);
+                printf("Deleted task: %s\n", options[NAME]);
                 return 0;
             }
         }
