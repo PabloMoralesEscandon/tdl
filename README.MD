@@ -15,11 +15,13 @@ A simple command-line to-do list manager made from scratch (using C standard lib
 git clone https://github.com/PabloMoralesEscandon/tdl.git
 cd tdl
 make release
+```
 
 ### Symlink to bin
 ```bash
 ln -sf "$PWD/tdl" ~/.local/bin/tdl
 ln -sf "$PWD/tdl" ~/bin/tdl
+```
 
 Usage
 -----
