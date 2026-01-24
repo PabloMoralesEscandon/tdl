@@ -3,20 +3,23 @@ TDL (ToDoList)
 
 A simple command-line to-do list manager made from scratch (using C standard libraries and jansson) as both a learning project and for personal usage.
 
-Installing
-----------
-Prerequisites
-- You need git and GNU make installed and of course a C compiler of your choice.
+## Installing
 
-Build
-    git clone https://github.com/PabloMoralesEscandon/tdl.git
-    cd tdl
-    make release
+### Prerequisites
+- Git
+- GNU Make
+- A C compiler (e.g., GCC or Clang)
 
-Symlink into bin (so it runs from anywhere)
-    ln -sf tdl ~/.local/bin/tdl
-or
-    ln -sf tdl ~/bin/tdl
+### Build
+```bash
+git clone https://github.com/PabloMoralesEscandon/tdl.git
+cd tdl
+make release
+
+### Symlink to bin
+```bash
+ln -sf "$PWD/tdl" ~/.local/bin/tdl
+ln -sf "$PWD/tdl" ~/bin/tdl
 
 Usage
 -----
