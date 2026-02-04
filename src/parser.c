@@ -499,6 +499,12 @@ int cmd_list_projects(char *options[], int id){
     printf(RESET);
     int alternate = 0;
     for(size_t i=0; i<to_do_proj.n_items; i++){
+	int done = 1;
+	for(size_t n=0; n<to_do_list.n_items; n++){
+	    if(!strcmp(to_do_proj.items[i], to_do_list.items[n].project))
+		done &= (to_do_list.items[n].status == DONE);
+	}
+	if(done) continue;
 	int bg;
 	if(alternate){
 	    bg = 235;
