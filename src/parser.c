@@ -20,6 +20,7 @@ Command commands[] = {
     {"list",    	cmd_list,		"List all tasks"},
     {"list_projects", 	cmd_list_projects,	"List all projects"},
     {"show_project", 	cmd_proj_show,		"Show information of a project"},
+    {"clear",		cmd_clear,		"Clear all done tasks, if not part of an ongoing project"},
     {NULL,     		NULL, 			NULL}  // Sentinel to mark end
 };
 
@@ -499,12 +500,6 @@ int cmd_list_projects(char *options[], int id){
     printf(RESET);
     int alternate = 0;
     for(size_t i=0; i<to_do_proj.n_items; i++){
-	int done = 1;
-	for(size_t n=0; n<to_do_list.n_items; n++){
-	    if(!strcmp(to_do_proj.items[i], to_do_list.items[n].project))
-		done &= (to_do_list.items[n].status == DONE);
-	}
-	if(done) continue;
 	int bg;
 	if(alternate){
 	    bg = 235;
@@ -543,6 +538,23 @@ int cmd_proj_show(char *options[], int id){
     }
     printf("No project with name %s", options[NAME]);
     return 1;
+}
+
+int cmd_clear(char *options[], int id){
+    (void)id;
+    (void)options;
+    for(size_t i=0; i<to_do_list.n_items; i++){
+	if(to_do_list.items[i].status == DONE){
+	    int in_project = 0;
+	    if(strcmp(to_do_list.items[i].project, "none")){
+		for(size_t n=0; n<to_do_proj.n_items; n++){
+		    in_project |= !strcmp(to_do_list.items[i].project, to_do_proj.items[n]);
+		}
+	    }
+	    if(!in_project) delete_task(FILE_NAME, to_do_list.items[i].id);
+	}
+    }
+    return 0;
 }
 static inline void set_bg256(int n) { printf(ESC "48;5;%dm", n); }
 static inline void set_fg256(int n) { printf(ESC "38;5;%dm", n); }

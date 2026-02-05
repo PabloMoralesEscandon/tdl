@@ -157,7 +157,7 @@ void load(const char *filename) {
 	    new_task.value = 0;
         }
         append(to_do_list, new_task);
-	if(strcmp(new_task.project, "none") && !is_in_proj_list(new_task.project)){
+	if(strcmp(new_task.project, "none") && !is_in_proj_list(new_task.project) && (new_task.status != DONE)){
 	    append(to_do_proj, new_task.project);
 	}
     }
