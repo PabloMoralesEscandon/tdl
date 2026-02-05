@@ -145,14 +145,14 @@ int cmd_add(char *options[], int id){
     new_task.id = task_id;
     new_task.status = TODO;
     if (options[NAME]) {
-        if ((strlen(options[NAME])+1) > NAME_CHARS) {
-            printf("Name is too long. Max %d characters.\n", NAME_CHARS);
+        if ((strlen(options[NAME])+1) > LONG_NAME_CHARS) {
+            printf("Name is too long. Max %d characters.\n", LONG_NAME_CHARS);
             return 1;
         }
         new_task.name = strdup(options[NAME]);
     }
     else {
-        char name[NAME_CHARS];
+        char name[LONG_NAME_CHARS];
         snprintf(name, sizeof(name), "Task %d", new_task.id);
         new_task.name = strdup(name);
     }
@@ -281,8 +281,8 @@ int cmd_mod(char *options[], int id){
         return 1;
     }
     if(options[NAME]){
-        if ((strlen(options[NAME])+1) > NAME_CHARS) {
-            printf("Name is too long. Max %d characters.\n", NAME_CHARS);
+        if ((strlen(options[NAME])+1) > LONG_NAME_CHARS) {
+            printf("Name is too long. Max %d characters.\n", LONG_NAME_CHARS);
             return 1;
         }
 	free(to_do_list.items[index].name);

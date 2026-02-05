@@ -5,6 +5,7 @@
 #include <time.h>
 
 #define NAME_CHARS 21
+#define LONG_NAME_CHARS 41
 #define DESC_CHARS 201
 
 #define ANSI_RESET     "\x1b[0m"

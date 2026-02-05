@@ -210,7 +210,7 @@ void print_proj(int id){
 }
 
 void print_task_table_header() {
-    printf("%-5s %-25s %-10s %-12s %-10s %-15s %-25s %-25s\n",
+    printf("%-5s %-45s %-10s %-12s %-10s %-15s %-25s %-25s\n",
            "ID", "Name", "Priority", "Due", "Recurrent", "Status", "Category", "Project");
 }
 
@@ -230,7 +230,7 @@ void print_task_table_row(Task *t) {
 	free(t->project);
 	(t->project) = strdup("-");
     }
-    printf("%-5d %-25s %-10s %-12s %-10s %-15s %-25s %-25s\n",
+    printf("%-5d %-45s %-10s %-12s %-10s %-15s %-25s %-25s\n",
            t->id,
            t->name ? t->name : "(none)",
            get_priority(t->priority),
