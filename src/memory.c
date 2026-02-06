@@ -141,21 +141,14 @@ void load(const char *filename) {
             new_task.recurrent = (int)json_integer_value(json_rec);
             new_task.status = (int)json_integer_value(json_stat);
             new_task.project = strdup(json_string_value(json_pro));
-	    new_task.value = -(new_task.priority + when_due(new_task.due));
+	    double time_until;
+	    if(new_task.due == 0) time_until = 7;
+	    else time_until = second_until(new_task.due)/(3600*24); 
+	    new_task.value = -(new_task.priority*100 - time_until);
         } else {
             fprintf(stderr, "Invalid or missing fields in item %zu\n", i);
-            // Initialize with defaults or skip
-            new_task.id = 0;
-            new_task.name = strdup("");
-            new_task.description = strdup("");
-            new_task.priority = 0;
-            new_task.due = 0;
-            new_task.category = strdup("");
-            new_task.recurrent = 0;
-            new_task.status = 0;
-            new_task.project = strdup("");
-	    new_task.value = 0;
-        }
+	    continue;
+	}
         append(to_do_list, new_task);
 	if(strcmp(new_task.project, "none") && !is_in_proj_list(new_task.project) && (new_task.status != DONE)){
 	    append(to_do_proj, new_task.project);
