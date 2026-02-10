@@ -243,9 +243,28 @@ int cmd_del(char *options[], int id){
         }
         printf("No task with name: %s\n", options[NAME]);
         return 1;
+    } else if(options[CATEGORY] != NULL){
+        for(size_t i=0; i<to_do_list.n_items; i++){
+            if(!strcmp(options[CATEGORY], to_do_list.items[i].category)){
+                id = to_do_list.items[i].id;
+                delete_task(FILE_NAME, id);
+                printf("Deleted task: %s\n", to_do_list.items[i].name);
+            }
+        }
+    } else if(options[PROJECT] != NULL){
+        for(size_t i=0; i<to_do_list.n_items; i++){
+            if(!strcmp(options[PROJECT], to_do_list.items[i].project)){
+                id = to_do_list.items[i].id;
+                delete_task(FILE_NAME, id);
+                printf("Deleted task: %s\n", to_do_list.items[i].name);
+            }
+        }
+    }else{
+	printf("Please provide id, name, category or project of task to delete\n");
+	return 1;
+
     }
-    printf("Please provide id or name of task to delete\n");
-    return 1;
+    return 0;
 }
 
 // Fix implementation (if no id -> get id -> logic)
