@@ -40,6 +40,7 @@ Commands
     list           List all tasks
     list_projects  List all projects
     show_project   Show information of a project
+    clear	   Clear all done tasks, if not part of an ongoing project
 
 Options
 -------
