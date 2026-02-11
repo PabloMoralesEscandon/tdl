@@ -6,6 +6,10 @@
 int main (int argc, char **argv) {
     load(FILE_NAME);
     update_recurrent(FILE_NAME);
+    if(argv[1]==NULL){
+	print_help();
+	return 0;
+    }
     char *command = argv[1];
     char *options[NUMBER_OPT] = {0};
     char *words = parse_words(argc, argv);

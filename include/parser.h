@@ -31,6 +31,8 @@ char *parse_words(int argc, char **argv);
 
 int parse_id_name(char *words);
 
+void print_help(void);
+
 int parse_options(int argc, char **argv, char* options[]);
 
 int cmd_add(char *options[], int id);
