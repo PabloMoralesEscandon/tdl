@@ -157,14 +157,11 @@ int cmd_add(char *options[], int id){
         new_task.name = strdup(name);
     }
     if(options[PRIORITY]){
-        if(!strcmp(options[PRIORITY], "low")) new_task.priority = LOW;
-        else if(!strcmp(options[PRIORITY], "medium")) new_task.priority = MEDIUM;
-        else if(!strcmp(options[PRIORITY], "high")) new_task.priority = HIGH;
-        else if(!strcmp(options[PRIORITY], "urgent")) new_task.priority = URGENT;
-        else{
+        int priority = get_priority_int(options[PRIORITY]);
+	if(priority == -1){
             printf("Invalid priority option: %s\nValid options: low, medium, high, urgent\n", options[RECURRENT]);
             return 1;
-        }
+        } else new_task.priority = priority;
     } else new_task.priority = MEDIUM;
     if(options[RECURRENT]){
         if(!strcmp(options[RECURRENT], "daily")) new_task.recurrent = DAILY;
@@ -308,14 +305,11 @@ int cmd_mod(char *options[], int id){
         to_do_list.items[index].name = strdup(options[NAME]);
     }
     if(options[PRIORITY]){
-        if(!strcmp(options[PRIORITY], "low") || !strcmp(options[PRIORITY], "l"))to_do_list.items[index].priority = LOW;
-        else if(!strcmp(options[PRIORITY], "medium") || !strcmp(options[PRIORITY], "m")) to_do_list.items[index].priority = MEDIUM;
-        else if(!strcmp(options[PRIORITY], "high")  || !strcmp(options[PRIORITY], "h"))to_do_list.items[index].priority = HIGH;
-        else if(!strcmp(options[PRIORITY], "urgent")  || !strcmp(options[PRIORITY], "u"))to_do_list.items[index].priority = URGENT;
-        else{
+        int priority = get_priority_int(options[PRIORITY]);
+	if(priority == -1){
             printf("Invalid priority option: %s\nValid options: low, medium, high, urgent\n", options[RECURRENT]);
             return 1;
-        }
+        } else to_do_list.items[index].priority = priority;
     }
     if(options[RECURRENT]){
         if(!strcmp(options[RECURRENT], "daily")) to_do_list.items[index].recurrent = DAILY;

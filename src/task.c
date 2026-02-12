@@ -75,10 +75,10 @@ char *get_priority(int priority){
 }
 
 int get_priority_int(char *priority){
-    if(!strcmp(priority, "low")) return LOW;
-    else if(!strcmp(priority, "medium")) return MEDIUM;
-    else if(!strcmp(priority, "high")) return HIGH;
-    else if(!strcmp(priority, "urgent")) return URGENT;
+    if(!strcmp(priority, "low") || !strcmp(priority, "l")) return LOW;
+    else if(!strcmp(priority, "medium") || !strcmp(priority, "m")) return MEDIUM;
+    else if(!strcmp(priority, "high") || !strcmp(priority, "h")) return HIGH;
+    else if(!strcmp(priority, "urgent") || !strcmp(priority, "u")) return URGENT;
     else{
            return -1;
     }
