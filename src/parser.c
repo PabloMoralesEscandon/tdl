@@ -308,10 +308,10 @@ int cmd_mod(char *options[], int id){
         to_do_list.items[index].name = strdup(options[NAME]);
     }
     if(options[PRIORITY]){
-        if(!strcmp(options[PRIORITY], "low")) to_do_list.items[index].priority = LOW;
-        else if(!strcmp(options[PRIORITY], "medium")) to_do_list.items[index].priority = MEDIUM;
-        else if(!strcmp(options[PRIORITY], "high")) to_do_list.items[index].priority = HIGH;
-        else if(!strcmp(options[PRIORITY], "urgent")) to_do_list.items[index].priority = URGENT;
+        if(!strcmp(options[PRIORITY], "low") || !strcmp(options[PRIORITY], "l"))to_do_list.items[index].priority = LOW;
+        else if(!strcmp(options[PRIORITY], "medium") || !strcmp(options[PRIORITY], "m")) to_do_list.items[index].priority = MEDIUM;
+        else if(!strcmp(options[PRIORITY], "high")  || !strcmp(options[PRIORITY], "h"))to_do_list.items[index].priority = HIGH;
+        else if(!strcmp(options[PRIORITY], "urgent")  || !strcmp(options[PRIORITY], "u"))to_do_list.items[index].priority = URGENT;
         else{
             printf("Invalid priority option: %s\nValid options: low, medium, high, urgent\n", options[RECURRENT]);
             return 1;
