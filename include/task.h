@@ -8,51 +8,32 @@
 #define LONG_NAME_CHARS 41
 #define DESC_CHARS 201
 
-#define ANSI_RESET     "\x1b[0m"
-#define ANSI_BOLD      "\x1b[1m"
-#define ANSI_BLUE      "\x1b[34m"
+#define ANSI_RESET "\x1b[0m"
+#define ANSI_BOLD "\x1b[1m"
+#define ANSI_BLUE "\x1b[34m"
 #define ANSI_BOLD_BLUE "\x1b[1;34m"
 
-enum Status {
-    TODO,
-    IN_PROGRESS,
-    DONE
-};
+enum Status { TODO, IN_PROGRESS, DONE };
 
-enum Priority {
-    LOW,
-    MEDIUM,
-    HIGH,
-    URGENT
-};
+enum Priority { LOW, MEDIUM, HIGH, URGENT };
 
-enum Recurrent{
-    NO,
-    DAILY,
-    WEEKLY,
-    MONTHLY,
-    YEARLY
-};
+enum Recurrent { NO, DAILY, WEEKLY, MONTHLY, YEARLY };
 
-enum Due{
-    LATER,
-    YEAR,
-    MONTH,
-    WEEK,
-    DAY
-};
+enum Due { LATER, YEAR, MONTH, WEEK, DAY };
 
-#define append(da, element)\
-    do{\
-        if(da.n_items >= da.size){\
-            if(da.size == 0) da.size = 256;\
-            else da.size*=2;\
-            da.items = realloc(da.items, da.size*sizeof(*da.items));\
-        }\
-        da.items[da.n_items++] = element;\
-    } while(0)\
+#define append(da, element)                                                    \
+    do {                                                                       \
+        if (da.n_items >= da.size) {                                           \
+            if (da.size == 0)                                                  \
+                da.size = 256;                                                 \
+            else                                                               \
+                da.size *= 2;                                                  \
+            da.items = realloc(da.items, da.size * sizeof(*da.items));         \
+        }                                                                      \
+        da.items[da.n_items++] = element;                                      \
+    } while (0)
 
-typedef struct{
+typedef struct {
     int id;
     char *name;
     char *description;
@@ -62,21 +43,19 @@ typedef struct{
     int status;
     char *category;
     char *project;
-    int value;
 } Task;
 
-typedef struct{
+typedef struct {
     Task *items;
     size_t n_items;
     size_t size;
 } ToDoList;
 
-typedef struct{
+typedef struct {
     char **items;
     size_t n_items;
     size_t size;
 } ToDoProjects;
-
 
 extern ToDoList to_do_list;
 
@@ -104,7 +83,7 @@ int when_due(time_t target);
 
 int is_in_proj_list(char *name);
 
-void print_proj(int id); 
+void print_proj(int id);
 
 void print_task_table_header();
 
