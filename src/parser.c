@@ -37,6 +37,7 @@ int dispatch_command(char *cmd, char *options[], int id) {
 
 char *parse_words(int argc, char **argv) {
     int i = 2;
+    // Agrupa los argumentos posicionales hasta la primera opcion "-x"/"--long".
     while ((i < argc) && (argv[i][0] != '-'))
         i++;
     int size = 0;
@@ -145,6 +146,7 @@ int cmd_add(char *options[], int id) {
     int task_id;
     new_task.id = -1;
     for (task_id = 0; task_id < (int)to_do_list.n_items; task_id++) {
+        // Busca el primer hueco libre para reutilizar IDs eliminados.
         if (task_id != to_do_list.items[task_id].id)
             break;
     }
@@ -191,6 +193,7 @@ int cmd_add(char *options[], int id) {
         new_task.recurrent = NO;
     if (options[DUE]) {
         struct tm date = {0};
+        // Parseo manual del formato DD-MM-YYYY.
         if ((strlen(options[DUE]) == 10) &&
             (isdigit(options[DUE][0]) && isdigit(options[DUE][1])) &&
             (isdigit(options[DUE][3]) && isdigit(options[DUE][4])) &&
@@ -502,7 +505,7 @@ int cmd_list(char *options[], int id) {
     printf(RESET);
     int alternate = 0;
     for (size_t i = 0; i < to_do_list.n_items; i++) {
-
+        // Cada filtro descarta filas antes de imprimir la tabla.
         if ((id != -1) && (to_do_list.items[i].id != id))
             continue;
         if (options[PRIORITY] && (to_do_list.items[i].priority !=
@@ -551,6 +554,7 @@ int cmd_list(char *options[], int id) {
         } else
             bg = 237;
         alternate = !alternate;
+        // Alterna el fondo para mejorar la legibilidad de la salida tabular.
         set_bg256(bg);
         print_task_table_row(&to_do_list.items[i]);
         printf(RESET);

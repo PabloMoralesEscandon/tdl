@@ -6,3 +6,4 @@ tasks.json
 compile_commands.json
 tdl
 *.copy
+.*

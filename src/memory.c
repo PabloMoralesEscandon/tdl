@@ -30,7 +30,7 @@ char *open_json_or_create_empty(const char *file) {
         json_load_file(path, 0, &error); // returns NULL on error [web:90]
 
     if (!root) {
-        // Create empty JSON array (use json_object() if you want {}). [web:48]
+        // Si el fichero no existe o no parsea, se inicializa un array vacio.
         json_t *empty = json_array(); // new reference, initially empty [web:48]
         if (!empty)
             return NULL;
@@ -78,7 +78,7 @@ void load(const char *filename) {
     free(to_do_list.items);
     free(to_do_proj.items);
 
-    // Iterate over the JSON array and fill the ToDoList
+    // Reconstruye memoria desde el JSON ya validado.
     for (size_t i = 0; i < items_count; i++) {
         json_t *json_item = json_array_get(jarray, i);
         Task new_task;
@@ -140,6 +140,7 @@ void load(const char *filename) {
         append(to_do_list, new_task);
         if (strcmp(new_task.project, "none") &&
             !is_in_proj_list(new_task.project) && (new_task.status != DONE)) {
+            // La lista de proyectos solo refleja proyectos activos.
             append(to_do_proj, new_task.project);
         }
     }
@@ -277,6 +278,7 @@ int delete_task(const char *filename, int target_id) {
 }
 
 void update_recurrent(const char *filename) {
+    (void)filename;
     for (size_t i = 0; i < to_do_list.n_items; i++) {
         if (to_do_list.items[i].recurrent &&
             to_do_list.items[i].status == DONE &&
@@ -284,6 +286,7 @@ void update_recurrent(const char *filename) {
             struct tm time = *localtime(&to_do_list.items[i].due);
             switch (to_do_list.items[i].recurrent) {
             case DAILY:
+                // Avanza hasta encontrar la siguiente ocurrencia futura.
                 time.tm_mday += 1;
                 to_do_list.items[i].due = mktime(&time);
                 while (second_until(to_do_list.items[i].due) < 0) {

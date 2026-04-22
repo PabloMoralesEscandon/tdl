@@ -17,6 +17,7 @@ int main (int argc, char **argv) {
     if(words!= NULL){
 	id = parse_id_name(words);
 	if(id==-1){ 
+	    // Si el argumento libre no es numerico, se interpreta como nombre.
 	    if(strcmp(command, "list")) options[NAME] = strdup(words);
 	    else if(!strcmp(words, "projects")) command = strdup("list_projects");
 	}
