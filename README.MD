@@ -14,7 +14,8 @@ A simple command-line to-do list manager made from scratch (using C standard lib
 ```bash
 git clone https://github.com/PabloMoralesEscandon/tdl.git
 cd tdl
-make release
+gcc nob.c -o nob
+./nob
 ```
 
 ### Symlink to bin
