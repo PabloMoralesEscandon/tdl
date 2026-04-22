@@ -7,3 +7,5 @@ compile_commands.json
 tdl
 *.copy
 .*
+nob
+nob.old
