@@ -9,6 +9,7 @@ A simple command-line to-do list manager made from scratch (using C standard lib
 - Git
 - GNU Make
 - A C compiler (e.g., GCC or Clang)
+- [Jansson](https://jansson.readthedocs.io/en/latest/#)
 
 ### Build
 ```bash
