@@ -67,6 +67,9 @@ int main(int argc, char **argv) {
 
     for (size_t i = 2; i < files.count; ++i) {
         const char *file = temp_sprintf(BUILD_FOLDER "%s", files.items[i]);
+        const char *ext = temp_file_ext(file);
+        if (ext == NULL || strcmp(ext, ".o") != 0)
+            continue;
         nob_cmd_append(&cmd, file);
     }
 

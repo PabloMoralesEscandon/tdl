@@ -7,7 +7,7 @@
  */
 
 /** @brief Numero total de slots usados para almacenar opciones parseadas. */
-#define NUMBER_OPT 8
+#define NUMBER_OPT 9
 
 /** @brief Prefijo base de una secuencia ANSI. */
 #define ESC "\x1b["
@@ -30,6 +30,8 @@
 #define NAME        6
 /** @brief Indice de la opcion de descripcion en el array de opciones. */
 #define DESC        7
+/** @brief Indice de la opcion de notificacion en el array de opciones. */
+#define NOTIFY      8
 
 /** @brief Nombre del fichero JSON usado como almacenamiento. */
 #define FILE_NAME "tasks.json"
@@ -94,11 +96,20 @@ int parse_options(int argc, char **argv, char *options[]);
 /** @brief Implementa el comando `add`. */
 int cmd_add(char *options[], int id);
 
+/** @brief Implementa el comando `add_project`. */
+int cmd_add_project(char *options[], int id);
+
 /** @brief Implementa el comando `del`. */
 int cmd_del(char *options[], int id);
 
+/** @brief Implementa el comando `del_project`. */
+int cmd_del_project(char *options[], int id);
+
 /** @brief Implementa el comando `mod`. */
 int cmd_mod(char *options[], int id);
+
+/** @brief Implementa el comando `mod_project`. */
+int cmd_mod_project(char *options[], int id);
 
 /** @brief Implementa el comando `start`. */
 int cmd_start(char *options[], int id);

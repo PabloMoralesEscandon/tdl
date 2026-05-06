@@ -22,12 +22,27 @@ void load(const char *filename);
 void save(Task *task, const char *filename);
 
 /**
+ * @brief Guarda un proyecto anadiendolo al fichero JSON.
+ * @param project Proyecto a persistir.
+ * @param filename Nombre del fichero JSON de salida.
+ */
+void save_project(Project *project, const char *filename);
+
+/**
  * @brief Elimina una tarea persistida por su identificador.
  * @param filename Nombre del fichero JSON.
  * @param target_id ID de la tarea a eliminar.
  * @return `0` si la operacion termina correctamente; `1` si falla.
  */
 int delete_task(const char *filename, int target_id);
+
+/**
+ * @brief Elimina un proyecto persistido por su identificador.
+ * @param filename Nombre del fichero JSON.
+ * @param target_id ID del proyecto a eliminar.
+ * @return `0` si la operacion termina correctamente; `1` si falla.
+ */
+int delete_project(const char *filename, int target_id);
 
 /**
  * @brief Recalcula las fechas de tareas recurrentes ya vencidas y completadas.

@@ -70,6 +70,13 @@ enum Due {
     DAY    /**< Vence dentro del proximo dia. */
 };
 
+/** @brief Notificar en el momento de vencimiento. */
+#define NOTIFY_AT_TIME     4
+/** @brief Notificar una hora antes del vencimiento. */
+#define NOTIFY_HOUR_BEFORE 2
+/** @brief Notificar durante el dia de vencimiento. */
+#define NOTIFY_DAY_OF      1
+
 /**
  * @brief Anade un elemento a un array dinamico basado en campos `items`, `n_items` y `size`.
  *
@@ -100,11 +107,30 @@ typedef struct {
     char *description;  /**< Descripcion libre. */
     int priority;       /**< Prioridad, usando @ref Priority. */
     time_t due;         /**< Fecha de vencimiento; 0 indica "sin fecha". */
+    int due_has_time;   /**< Indica si la fecha de vencimiento incluye hora. */
+    int notify;         /**< Bitfield THD de notificaciones. */
     int recurrent;      /**< Regla de recurrencia, usando @ref Recurrent. */
     int status;         /**< Estado actual, usando @ref Status. */
     char *category;     /**< Categoria funcional o "none". */
     char *project;      /**< Proyecto asociado o "none". */
 } Task;
+
+/**
+ * @struct Project
+ * @brief Representa un proyecto persistido con metadatos propios.
+ */
+typedef struct {
+    int id;             /**< Identificador unico del proyecto. */
+    char *name;         /**< Nombre corto del proyecto. */
+    char *description;  /**< Descripcion libre. */
+    int priority;       /**< Prioridad por defecto para tareas asociadas. */
+    time_t due;         /**< Fecha de vencimiento por defecto. */
+    int due_has_time;   /**< Indica si la fecha de vencimiento incluye hora. */
+    int notify;         /**< Bitfield THD de notificaciones por defecto. */
+    int recurrent;      /**< Recurrencia por defecto. */
+    int status;         /**< Estado propio del proyecto. */
+    char *category;     /**< Categoria por defecto. */
+} Project;
 
 /**
  * @struct ToDoList
@@ -121,7 +147,7 @@ typedef struct {
  * @brief Array dinamico con los nombres de proyectos activos.
  */
 typedef struct {
-    char **items;    /**< Buffer con nombres de proyecto. */
+    Project *items;  /**< Buffer con proyectos. */
     size_t n_items;  /**< Numero de proyectos almacenados. */
     size_t size;     /**< Capacidad reservada en `items`. */
 } ToDoProjects;
@@ -209,10 +235,30 @@ int when_due(time_t target);
 int is_in_proj_list(char *name);
 
 /**
+ * @brief Busca un proyecto por nombre.
+ * @param name Nombre del proyecto.
+ * @return Puntero al proyecto o `NULL` si no existe.
+ */
+Project *find_project_by_name(const char *name);
+
+/**
+ * @brief Busca un proyecto por ID.
+ * @param id Identificador del proyecto.
+ * @return Puntero al proyecto o `NULL` si no existe.
+ */
+Project *find_project_by_id(int id);
+
+/**
  * @brief Imprime el resumen y progreso de un proyecto.
- * @param id Indice del proyecto en @ref to_do_proj.
+ * @param id Identificador persistido del proyecto.
  */
 void print_proj(int id);
+
+/**
+ * @brief Imprime un proyecto en formato detallado.
+ * @param project Proyecto a mostrar.
+ */
+void print_project(Project *project);
 
 /** @brief Imprime la cabecera de la tabla de tareas. */
 void print_task_table_header();
@@ -228,9 +274,8 @@ void print_proj_table_header();
 
 /**
  * @brief Imprime una fila de la tabla de proyectos.
- * @param proj Nombre del proyecto.
- * @param id Indice mostrado para el proyecto.
+ * @param proj Proyecto a imprimir.
  */
-void print_proj_table_row(char *proj, int id);
+void print_proj_table_row(Project *proj);
 
 #endif

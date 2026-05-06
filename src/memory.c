@@ -2,279 +2,353 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/stat.h>
 #include <time.h>
 
 #include "task.h"
 #include "utils.h"
 
-const char *dir = "/home/pablome/.local/tdl/";
-
 char *open_json_or_create_empty(const char *file) {
-    struct stat statbuf;
-    if (stat(dir, &statbuf)) {
-        if (mkdir(dir, 0755)) {
-            printf("Failed to create directory for tasks.json\n");
-            return NULL;
-        }
-    }
-    size_t size = strlen(dir) + strlen(file) + 1;
+    size_t size = strlen(file) + 1;
     char *path = malloc(size);
     if (!path) {
         puts("Could not allocate path string");
         return NULL;
     }
-    snprintf(path, size, "%s%s", dir, file);
+    snprintf(path, size, "%s", file);
+
     json_error_t error;
-    json_t *root =
-        json_load_file(path, 0, &error); // returns NULL on error [web:90]
-
+    json_t *root = json_load_file(path, 0, &error);
     if (!root) {
-        // Si el fichero no existe o no parsea, se inicializa un array vacio.
-        json_t *empty = json_array(); // new reference, initially empty [web:48]
-        if (!empty)
-            return NULL;
-
-        // Write JSON to file; if path exists, it is overwritten. [web:51]
-        if (json_dump_file(empty, path, JSON_INDENT(2)) != 0) {
-            json_decref(empty);
+        root = json_object();
+        json_object_set_new(root, "tasks", json_array());
+        json_object_set_new(root, "projects", json_array());
+        if (json_dump_file(root, path, JSON_INDENT(2)) != 0) {
+            json_decref(root);
+            free(path);
             return NULL;
         }
-        json_decref(empty);
-
-        // Now it exists and is valid JSON; open stream for the caller.
-        return path;
     }
 
-    // File exists and parsed OK; free parsed JSON and open stream for reading.
     json_decref(root);
     return path;
 }
 
-void load(const char *filename) {
-    // Open the file for reading
-    FILE *file = fopen(open_json_or_create_empty(filename), "r");
-    if (file == NULL) {
-        perror("Error opening file");
-        return;
-    }
-
-    // Load the JSON array from the file
-    json_error_t error;
-    json_t *jarray = json_loadf(file, 0, &error);
-    fclose(file);
-    if (jarray == NULL) {
-        fprintf(stderr, "Error parsing JSON: %s\n", error.text);
-        return;
-    }
-
-    if (!json_is_array(jarray)) {
-        fprintf(stderr, "JSON root is not an array\n");
-        json_decref(jarray);
-        return;
-    }
-
-    size_t items_count = json_array_size(jarray);
-    free(to_do_list.items);
-    free(to_do_proj.items);
-
-    // Reconstruye memoria desde el JSON ya validado.
-    for (size_t i = 0; i < items_count; i++) {
-        json_t *json_item = json_array_get(jarray, i);
-        Task new_task;
-        if (!json_is_object(json_item)) {
-            fprintf(stderr, "Item %zu is not a JSON object\n", i);
-            continue;
-        }
-
-        json_t *json_id = json_object_get(json_item, "id");
-        json_t *json_name = json_object_get(json_item, "name");
-        json_t *json_desc = json_object_get(json_item, "description");
-        json_t *json_prio = json_object_get(json_item, "priority");
-        json_t *json_sec = json_object_get(json_item, "tm_sec");
-        json_t *json_min = json_object_get(json_item, "tm_min");
-        json_t *json_hour = json_object_get(json_item, "tm_hour");
-        json_t *json_mday = json_object_get(json_item, "tm_mday");
-        json_t *json_mon = json_object_get(json_item, "tm_mon");
-        json_t *json_year = json_object_get(json_item, "tm_year");
-        json_t *json_wday = json_object_get(json_item, "tm_wday");
-        json_t *json_yday = json_object_get(json_item, "tm_yday");
-        json_t *json_isdst = json_object_get(json_item, "tm_isdst");
-        json_t *json_cat = json_object_get(json_item, "category");
-        json_t *json_rec = json_object_get(json_item, "recurrent");
-        json_t *json_stat = json_object_get(json_item, "status");
-        json_t *json_pro = json_object_get(json_item, "project");
-
-        if (json_is_integer(json_id) && json_is_string(json_name) &&
-            json_is_string(json_desc) && json_is_integer(json_prio) &&
-            json_is_integer(json_sec) && json_is_integer(json_min) &&
-            json_is_integer(json_hour) && json_is_integer(json_mday) &&
-            json_is_integer(json_mon) && json_is_integer(json_year) &&
-            json_is_integer(json_wday) && json_is_integer(json_yday) &&
-            json_is_integer(json_isdst) && json_is_string(json_cat) &&
-            json_is_integer(json_rec) && json_is_integer(json_stat) &&
-            json_is_string(json_pro)) {
-            new_task.id = (int)json_integer_value(json_id);
-            new_task.name = strdup(json_string_value(json_name));
-            new_task.description = strdup(json_string_value(json_desc));
-            new_task.priority = (int)json_integer_value(json_prio);
-            struct tm date = {0};
-            date.tm_sec = (int)json_integer_value(json_sec);
-            date.tm_min = (int)json_integer_value(json_min);
-            date.tm_hour = (int)json_integer_value(json_hour);
-            date.tm_mday = (int)json_integer_value(json_mday);
-            date.tm_mon = (int)json_integer_value(json_mon);
-            date.tm_year = (int)json_integer_value(json_year);
-            date.tm_wday = (int)json_integer_value(json_wday);
-            date.tm_yday = (int)json_integer_value(json_yday);
-            date.tm_isdst = (int)json_integer_value(json_isdst);
-            new_task.due = mktime(&date);
-            new_task.category = strdup(json_string_value(json_cat));
-            new_task.recurrent = (int)json_integer_value(json_rec);
-            new_task.status = (int)json_integer_value(json_stat);
-            new_task.project = strdup(json_string_value(json_pro));
-        } else {
-            fprintf(stderr, "Invalid or missing fields in item %zu\n", i);
-            continue;
-        }
-        append(to_do_list, new_task);
-        if (strcmp(new_task.project, "none") &&
-            !is_in_proj_list(new_task.project) && (new_task.status != DONE)) {
-            // La lista de proyectos solo refleja proyectos activos.
-            append(to_do_proj, new_task.project);
-        }
-    }
-
-    json_decref(jarray);
-
-    sort_list(to_do_list.items, 0, to_do_list.n_items - 1);
+static json_t *empty_storage_root(void) {
+    json_t *root = json_object();
+    json_object_set_new(root, "tasks", json_array());
+    json_object_set_new(root, "projects", json_array());
+    return root;
 }
 
-void save(Task *task, const char *filename) {
-    json_t *jarray = NULL;
-    json_error_t error;
+static void ensure_array_member(json_t *root, const char *key) {
+    json_t *array = json_object_get(root, key);
+    if (!json_is_array(array))
+        json_object_set_new(root, key, json_array());
+}
 
-    // Try to open existing file for reading
-    FILE *file = fopen(open_json_or_create_empty(filename), "r");
-    if (file != NULL) {
-        jarray = json_loadf(file, 0, &error);
-        fclose(file);
-        file = NULL;
-        if (jarray == NULL) {
-            fprintf(stderr, "Error parsing JSON: %s\n", error.text);
-            // Create new array if parsing failed
-            jarray = json_array();
-        } else if (!json_is_array(jarray)) {
-            fprintf(stderr, "JSON root is not an array, creating new array\n");
-            json_decref(jarray);
-            jarray = json_array();
-        }
-    } else {
-        // File does not exist, create new JSON array
-        jarray = json_array();
+static json_t *read_storage(const char *filename) {
+    char *path = open_json_or_create_empty(filename);
+    if (!path)
+        return empty_storage_root();
+
+    json_error_t error;
+    json_t *loaded = json_load_file(path, 0, &error);
+    free(path);
+
+    if (!loaded)
+        return empty_storage_root();
+
+    if (json_is_array(loaded)) {
+        json_t *root = json_object();
+        json_object_set_new(root, "tasks", loaded);
+        json_object_set_new(root, "projects", json_array());
+        return root;
     }
 
-    // Create a new JSON object for the task
-    json_t *json_task = json_object();
+    if (!json_is_object(loaded)) {
+        json_decref(loaded);
+        return empty_storage_root();
+    }
 
-    // Add the task properties to the JSON object
+    ensure_array_member(loaded, "tasks");
+    ensure_array_member(loaded, "projects");
+    return loaded;
+}
+
+static int write_storage(const char *filename, json_t *root) {
+    char *path = open_json_or_create_empty(filename);
+    if (!path)
+        return 1;
+
+    int result = json_dump_file(root, path, JSON_INDENT(4));
+    free(path);
+
+    if (result != 0) {
+        fprintf(stderr, "Error writing JSON to file\n");
+        return 1;
+    }
+    return 0;
+}
+
+static int json_int_or(json_t *object, const char *key, int fallback) {
+    json_t *value = json_object_get(object, key);
+    return json_is_integer(value) ? (int)json_integer_value(value) : fallback;
+}
+
+static char *json_string_dup_or(json_t *object, const char *key,
+                                const char *fallback) {
+    json_t *value = json_object_get(object, key);
+    return strdup(json_is_string(value) ? json_string_value(value) : fallback);
+}
+
+static time_t json_due_or_zero(json_t *object) {
+    json_t *json_sec = json_object_get(object, "tm_sec");
+    json_t *json_min = json_object_get(object, "tm_min");
+    json_t *json_hour = json_object_get(object, "tm_hour");
+    json_t *json_mday = json_object_get(object, "tm_mday");
+    json_t *json_mon = json_object_get(object, "tm_mon");
+    json_t *json_year = json_object_get(object, "tm_year");
+    json_t *json_wday = json_object_get(object, "tm_wday");
+    json_t *json_yday = json_object_get(object, "tm_yday");
+    json_t *json_isdst = json_object_get(object, "tm_isdst");
+
+    if (!(json_is_integer(json_sec) && json_is_integer(json_min) &&
+          json_is_integer(json_hour) && json_is_integer(json_mday) &&
+          json_is_integer(json_mon) && json_is_integer(json_year) &&
+          json_is_integer(json_wday) && json_is_integer(json_yday) &&
+          json_is_integer(json_isdst))) {
+        return 0;
+    }
+
+    struct tm date = {0};
+    date.tm_sec = (int)json_integer_value(json_sec);
+    date.tm_min = (int)json_integer_value(json_min);
+    date.tm_hour = (int)json_integer_value(json_hour);
+    date.tm_mday = (int)json_integer_value(json_mday);
+    date.tm_mon = (int)json_integer_value(json_mon);
+    date.tm_year = (int)json_integer_value(json_year);
+    date.tm_wday = (int)json_integer_value(json_wday);
+    date.tm_yday = (int)json_integer_value(json_yday);
+    date.tm_isdst = (int)json_integer_value(json_isdst);
+    return mktime(&date);
+}
+
+static void json_set_due(json_t *object, time_t due) {
+    struct tm *date = localtime(&due);
+    json_object_set_new(object, "tm_sec", json_integer(date->tm_sec));
+    json_object_set_new(object, "tm_min", json_integer(date->tm_min));
+    json_object_set_new(object, "tm_hour", json_integer(date->tm_hour));
+    json_object_set_new(object, "tm_mday", json_integer(date->tm_mday));
+    json_object_set_new(object, "tm_mon", json_integer(date->tm_mon));
+    json_object_set_new(object, "tm_year", json_integer(date->tm_year));
+    json_object_set_new(object, "tm_wday", json_integer(date->tm_wday));
+    json_object_set_new(object, "tm_yday", json_integer(date->tm_yday));
+    json_object_set_new(object, "tm_isdst", json_integer(date->tm_isdst));
+}
+
+static json_t *task_to_json(Task *task) {
+    json_t *json_task = json_object();
     json_object_set_new(json_task, "id", json_integer(task->id));
     json_object_set_new(json_task, "name", json_string(task->name));
     json_object_set_new(json_task, "description",
                         json_string(task->description));
     json_object_set_new(json_task, "priority", json_integer(task->priority));
-    struct tm *date = localtime(&(task->due));
-    json_object_set_new(json_task, "tm_sec", json_integer(date->tm_sec));
-    json_object_set_new(json_task, "tm_min", json_integer(date->tm_min));
-    json_object_set_new(json_task, "tm_hour", json_integer(date->tm_hour));
-    json_object_set_new(json_task, "tm_mday", json_integer(date->tm_mday));
-    json_object_set_new(json_task, "tm_mon", json_integer(date->tm_mon));
-    json_object_set_new(json_task, "tm_year", json_integer(date->tm_year));
-    json_object_set_new(json_task, "tm_wday", json_integer(date->tm_wday));
-    json_object_set_new(json_task, "tm_yday", json_integer(date->tm_yday));
-    json_object_set_new(json_task, "tm_isdst", json_integer(date->tm_isdst));
+    json_set_due(json_task, task->due);
+    // Guarda si la fecha debe mostrarse con hora y los bits THD de notify.
+    json_object_set_new(json_task, "due_has_time",
+                        json_integer(task->due_has_time));
+    json_object_set_new(json_task, "notify", json_integer(task->notify));
     json_object_set_new(json_task, "category", json_string(task->category));
     json_object_set_new(json_task, "recurrent", json_integer(task->recurrent));
     json_object_set_new(json_task, "status", json_integer(task->status));
     json_object_set_new(json_task, "project", json_string(task->project));
-
-    // Append the new task to the JSON array
-    json_array_append_new(jarray, json_task);
-    file = fopen(open_json_or_create_empty(filename), "w");
-    if (file == NULL) {
-        perror("Error opening file for writing");
-        json_decref(jarray);
-        return;
-    }
-
-    // Write the updated JSON array back to the file
-    if (json_dumpf(jarray, file, JSON_INDENT(4)) != 0) {
-        perror("Error writing JSON to file");
-    }
-
-    fclose(file);
-    json_decref(jarray);
+    return json_task;
 }
 
-int delete_task(const char *filename, int target_id) {
-    json_error_t error;
-    json_t *root;
-    FILE *file = fopen(open_json_or_create_empty(filename), "r");
-    // 1. Load and parse JSON file
-    root = json_loadf(file, 0, &error);
-    fclose(file);
-    if (!root) {
-        fprintf(stderr, "Error loading JSON: %s (line %d)\n", error.text,
-                error.line);
-        return 1;
-    }
+static json_t *project_to_json(Project *project) {
+    json_t *json_project = json_object();
+    json_object_set_new(json_project, "id", json_integer(project->id));
+    json_object_set_new(json_project, "name", json_string(project->name));
+    json_object_set_new(json_project, "description",
+                        json_string(project->description));
+    json_object_set_new(json_project, "priority",
+                        json_integer(project->priority));
+    json_set_due(json_project, project->due);
+    // Los proyectos persisten los mismos defaults temporales que las tareas.
+    json_object_set_new(json_project, "due_has_time",
+                        json_integer(project->due_has_time));
+    json_object_set_new(json_project, "notify", json_integer(project->notify));
+    json_object_set_new(json_project, "category",
+                        json_string(project->category));
+    json_object_set_new(json_project, "recurrent",
+                        json_integer(project->recurrent));
+    json_object_set_new(json_project, "status", json_integer(project->status));
+    return json_project;
+}
 
-    // 2. Verify it's an array
-    if (!json_is_array(root)) {
-        fprintf(stderr, "Root is not an array\n");
-        json_decref(root);
-        return 1;
-    }
+static int parse_task(json_t *json_item, Task *task) {
+    if (!json_is_object(json_item))
+        return 0;
 
-    // 3. Find and remove target item
+    json_t *json_id = json_object_get(json_item, "id");
+    json_t *json_name = json_object_get(json_item, "name");
+    if (!json_is_integer(json_id) || !json_is_string(json_name))
+        return 0;
+
+    task->id = (int)json_integer_value(json_id);
+    task->name = strdup(json_string_value(json_name));
+    task->description = json_string_dup_or(json_item, "description", "none");
+    task->priority = json_int_or(json_item, "priority", MEDIUM);
+    task->due = json_due_or_zero(json_item);
+    // Los ficheros antiguos no tienen estos campos; se cargan como desactivados.
+    task->due_has_time = json_int_or(json_item, "due_has_time", 0);
+    task->notify = json_int_or(json_item, "notify", 0) & 7;
+    task->category = json_string_dup_or(json_item, "category", "none");
+    task->recurrent = json_int_or(json_item, "recurrent", NO);
+    task->status = json_int_or(json_item, "status", TODO);
+    task->project = json_string_dup_or(json_item, "project", "none");
+    return 1;
+}
+
+static int parse_project(json_t *json_item, Project *project) {
+    if (!json_is_object(json_item))
+        return 0;
+
+    json_t *json_id = json_object_get(json_item, "id");
+    json_t *json_name = json_object_get(json_item, "name");
+    if (!json_is_integer(json_id) || !json_is_string(json_name))
+        return 0;
+
+    project->id = (int)json_integer_value(json_id);
+    project->name = strdup(json_string_value(json_name));
+    project->description = json_string_dup_or(json_item, "description", "none");
+    project->priority = json_int_or(json_item, "priority", MEDIUM);
+    project->due = json_due_or_zero(json_item);
+    // Limita notify a los tres bits utiles al cargar desde JSON.
+    project->due_has_time = json_int_or(json_item, "due_has_time", 0);
+    project->notify = json_int_or(json_item, "notify", 0) & 7;
+    project->category = json_string_dup_or(json_item, "category", "none");
+    project->recurrent = json_int_or(json_item, "recurrent", NO);
+    project->status = json_int_or(json_item, "status", TODO);
+    return 1;
+}
+
+static int next_project_id(void) {
+    int id;
+    for (id = 0; id < (int)to_do_proj.n_items; id++) {
+        if (!find_project_by_id(id))
+            break;
+    }
+    return id;
+}
+
+static Project default_project_for_name(const char *name) {
+    Project project = {0};
+    project.id = next_project_id();
+    project.name = strdup(name);
+    project.description = strdup("none");
+    project.priority = MEDIUM;
+    project.due = 0;
+    project.due_has_time = 0;
+    project.notify = 0;
+    project.category = strdup("none");
+    project.recurrent = NO;
+    project.status = TODO;
+    return project;
+}
+
+void load(const char *filename) {
+    json_t *root = read_storage(filename);
+    json_t *projects = json_object_get(root, "projects");
+    json_t *tasks = json_object_get(root, "tasks");
+
+    free(to_do_list.items);
+    free(to_do_proj.items);
+    to_do_list.items = NULL;
+    to_do_list.n_items = 0;
+    to_do_list.size = 0;
+    to_do_proj.items = NULL;
+    to_do_proj.n_items = 0;
+    to_do_proj.size = 0;
+
     size_t index;
     json_t *value;
-    int found = 0;
+    json_array_foreach(projects, index, value) {
+        Project project;
+        if (parse_project(value, &project))
+            append(to_do_proj, project);
+        else
+            fprintf(stderr, "Invalid project at index %zu\n", index);
+    }
 
-    json_array_foreach(root, index, value) {
-        json_t *id_obj = json_object_get(value, "id");
-        if (id_obj && json_is_integer(id_obj)) {
-            if (json_integer_value(id_obj) == target_id) {
-                json_array_remove(root, index);
-                found = 1;
-                break;
-            }
+    json_array_foreach(tasks, index, value) {
+        Task task;
+        if (!parse_task(value, &task)) {
+            fprintf(stderr, "Invalid task at index %zu\n", index);
+            continue;
+        }
+        append(to_do_list, task);
+        if (strcmp(task.project, "none") && !is_in_proj_list(task.project)) {
+            Project project = default_project_for_name(task.project);
+            append(to_do_proj, project);
         }
     }
 
-    if (!found) {
-        printf("No item with ID %d found\n", target_id);
-    }
-
-    file = fopen(open_json_or_create_empty(filename), "w");
-    if (file == NULL) {
-        perror("Error opening file for writing");
-        json_decref(root);
-        return 1;
-    }
-
-    // 4. Save modified JSON back to file
-    if (json_dumpf(root, file, JSON_INDENT(4)) != 0) {
-        fprintf(stderr, "Error saving file\n");
-        json_decref(root);
-        fclose(file);
-        return 1;
-    }
-
-    // 5. Cleanup
-    fclose(file);
     json_decref(root);
+
+    sort_list(to_do_list.items, 0, to_do_list.n_items - 1);
+}
+
+void save(Task *task, const char *filename) {
+    json_t *root = read_storage(filename);
+    json_t *tasks = json_object_get(root, "tasks");
+    json_array_append_new(tasks, task_to_json(task));
+    write_storage(filename, root);
+    json_decref(root);
+}
+
+void save_project(Project *project, const char *filename) {
+    json_t *root = read_storage(filename);
+    json_t *projects = json_object_get(root, "projects");
+    json_array_append_new(projects, project_to_json(project));
+    write_storage(filename, root);
+    json_decref(root);
+}
+
+static int delete_from_array_by_id(json_t *array, int target_id) {
+    size_t index;
+    json_t *value;
+    json_array_foreach(array, index, value) {
+        json_t *id_obj = json_object_get(value, "id");
+        if (json_is_integer(id_obj) && json_integer_value(id_obj) == target_id) {
+            json_array_remove(array, index);
+            return 1;
+        }
+    }
     return 0;
+}
+
+int delete_task(const char *filename, int target_id) {
+    json_t *root = read_storage(filename);
+    json_t *tasks = json_object_get(root, "tasks");
+    int found = delete_from_array_by_id(tasks, target_id);
+
+    if (!found)
+        printf("No task with ID %d found\n", target_id);
+
+    int result = write_storage(filename, root);
+    json_decref(root);
+    return result;
+}
+
+int delete_project(const char *filename, int target_id) {
+    json_t *root = read_storage(filename);
+    json_t *projects = json_object_get(root, "projects");
+    delete_from_array_by_id(projects, target_id);
+
+    int result = write_storage(filename, root);
+    json_decref(root);
+    return result;
 }
 
 void update_recurrent(const char *filename) {
@@ -301,7 +375,6 @@ void update_recurrent(const char *filename) {
                     time.tm_mday += 7;
                     to_do_list.items[i].due = mktime(&time);
                 }
-
                 break;
             case MONTHLY:
                 time.tm_mon += 1;
@@ -310,7 +383,6 @@ void update_recurrent(const char *filename) {
                     time.tm_mon += 1;
                     to_do_list.items[i].due = mktime(&time);
                 }
-
                 break;
             case YEARLY:
                 time.tm_year += 1;
@@ -319,11 +391,10 @@ void update_recurrent(const char *filename) {
                     time.tm_year += 1;
                     to_do_list.items[i].due = mktime(&time);
                 }
-
                 break;
             }
             to_do_list.items[i].status = TODO;
-            delete_task(filename, i);
+            delete_task(filename, to_do_list.items[i].id);
             save(&to_do_list.items[i], filename);
         }
     }
